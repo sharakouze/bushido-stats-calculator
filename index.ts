@@ -130,6 +130,9 @@ function getAverage(arr: number[]): number {
 }
 
 function getStandardDeviation(arr: number[]): number {
+    if (arr.length == 0) {
+        return NaN;
+    }
     const n = arr.length
     const mean = arr.reduce((a, b) => a + b) / n
     return Math.sqrt(arr.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
@@ -307,7 +310,7 @@ btnCalcRanged!.addEventListener('click', () => {
 
         const table = renderRangedTable(shortRangeWounds, mediumRangeWounds, longRangeWounds);
 
-        let text = 'Pool ' + pool + ' | Attack Modifier ' + attModifier + ' | Damage Modifier ' + dmgModifier;
+        let text = 'Pool ' + pool + ' | Attack Challenge mod. ' + attModifier + ' | Damage mod. ' + dmgModifier;
         if (brutal) {
             text += ' | Brutal (' + brutal + ')';
         }

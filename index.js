@@ -106,12 +106,9 @@ function getMedian(arr) {
     if (arr.length == 0) {
         return NaN;
     }
-    arr.sort((a, b) => a - b); // 1.
-    const midpoint = Math.floor(arr.length / 2); // 2.
-    const median = arr.length % 2 === 1 ?
-        arr[midpoint] : // 3.1. If odd length, just take midpoint
-        (arr[midpoint - 1] + arr[midpoint]) / 2; // 3.2. If even length, take median of midpoints
-    return median;
+    arr.sort((a, b) => a - b);
+    const midpoint = Math.floor(arr.length / 2);
+    return arr.length % 2 === 1 ? arr[midpoint] : (arr[midpoint - 1] + arr[midpoint]) / 2;
 }
 function getAverage(arr) {
     if (arr.length == 0) {
@@ -120,6 +117,9 @@ function getAverage(arr) {
     return arr.reduce((a, b) => a + b) / arr.length;
 }
 function getStandardDeviation(arr) {
+    if (arr.length == 0) {
+        return NaN;
+    }
     const n = arr.length;
     const mean = arr.reduce((a, b) => a + b) / n;
     return Math.sqrt(arr.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
@@ -260,7 +260,7 @@ btnCalcRanged.addEventListener('click', () => {
             longRangeWounds.push(longRangeWound);
         }
         const table = renderRangedTable(shortRangeWounds, mediumRangeWounds, longRangeWounds);
-        let text = 'Pool ' + pool + ' | Attack Modifier ' + attModifier + ' | Damage Modifier ' + dmgModifier;
+        let text = 'Pool ' + pool + ' | Attack Challenge mod. ' + attModifier + ' | Damage mod. ' + dmgModifier;
         if (brutal) {
             text += ' | Brutal (' + brutal + ')';
         }
