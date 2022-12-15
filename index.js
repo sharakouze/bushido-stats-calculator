@@ -68,7 +68,7 @@ function getSucessLevels(sl, combo) {
     }
     return levels;
 }
-function getWounds(dmgRollMod, sl) {
+function getWounds(dmgRollMod, sl, tough) {
     if (dmgRollMod < 2) {
         dmgRollMod = 2;
     }
@@ -76,7 +76,7 @@ function getWounds(dmgRollMod, sl) {
         dmgRollMod = 12;
     }
     const dmgMod = [0, 0, -3, -2, -1, -1, 0, 0, 0, 1, 1, 2, 3];
-    const wounds = sl + dmgMod[dmgRollMod];
+    const wounds = sl + dmgMod[dmgRollMod] - tough;
     if (wounds < 0) {
         return 0;
     }
@@ -189,6 +189,8 @@ btnCalcRanged.addEventListener('click', () => {
         const strong = Boolean(Number(selectStrong.value));
         const inputDmgModifier = document.querySelector('#ranged-dmg-modifier');
         const dmgModifier = Number(inputDmgModifier.value);
+        const inputTough = document.querySelector('#ranged-tough');
+        const tough = Number(inputTough.value);
         const shortRangeWounds = [];
         const mediumRangeWounds = [];
         const longRangeWounds = [];
@@ -224,14 +226,14 @@ btnCalcRanged.addEventListener('click', () => {
                     const dmgRoll = dmgDices.slice(0, 2).reduce((a, b) => a + b);
                     const dmgRollMod = dmgRoll + dmgModifier;
                     const sl1 = shortRangeSLs[i];
-                    shortRangeWound += getWounds(dmgRollMod, sl1);
+                    shortRangeWound += getWounds(dmgRollMod, sl1, tough);
                     const sl2 = mediumRangeSLs[i];
                     if (sl2 !== undefined) {
-                        mediumRangeWound += getWounds(dmgRollMod, sl2);
+                        mediumRangeWound += getWounds(dmgRollMod, sl2, tough);
                     }
                     const sl3 = longRangeSLs[i];
                     if (sl3 !== undefined) {
-                        longRangeWound += getWounds(dmgRollMod, sl3);
+                        longRangeWound += getWounds(dmgRollMod, sl3, tough);
                     }
                 }
             }
@@ -252,6 +254,9 @@ btnCalcRanged.addEventListener('click', () => {
         }
         if (combo) {
             text += ' | Combo Attack';
+        }
+        if (tough) {
+            text += ' | Tough (' + tough + ')';
         }
         const caption = table.createCaption();
         caption.innerText = text;

@@ -75,7 +75,7 @@ function getSucessLevels(sl: number, combo: boolean) {
     return levels;
 }
 
-function getWounds(dmgRollMod: number, sl: number) {
+function getWounds(dmgRollMod: number, sl: number, tough: number) {
     if (dmgRollMod < 2) {
         dmgRollMod = 2;
     }
@@ -84,7 +84,7 @@ function getWounds(dmgRollMod: number, sl: number) {
     }
 
     const dmgMod = [0, 0, -3, -2, -1, -1, 0, 0, 0, 1, 1, 2, 3];
-    const wounds = sl + dmgMod[dmgRollMod];
+    const wounds = sl + dmgMod[dmgRollMod] - tough;
 
     if (wounds < 0) {
         return 0;
@@ -222,6 +222,9 @@ btnCalcRanged!.addEventListener('click', () => {
         const inputDmgModifier = document.querySelector<HTMLInputElement>('#ranged-dmg-modifier');
         const dmgModifier = Number(inputDmgModifier!.value);
 
+        const inputTough = document.querySelector<HTMLInputElement>('#ranged-tough');
+        const tough = Number(inputTough!.value);
+
         const shortRangeWounds: number[] = [];
         const mediumRangeWounds: number[] = [];
         const longRangeWounds: number[] = [];
@@ -268,16 +271,16 @@ btnCalcRanged!.addEventListener('click', () => {
                     const dmgRollMod = dmgRoll + dmgModifier;
 
                     const sl1 = shortRangeSLs[i];
-                    shortRangeWound += getWounds(dmgRollMod, sl1);
+                    shortRangeWound += getWounds(dmgRollMod, sl1, tough);
 
                     const sl2 = mediumRangeSLs[i];
                     if (sl2 !== undefined) {
-                        mediumRangeWound += getWounds(dmgRollMod, sl2);
+                        mediumRangeWound += getWounds(dmgRollMod, sl2, tough);
                     }
 
                     const sl3 = longRangeSLs[i];
                     if (sl3 !== undefined) {
-                        longRangeWound += getWounds(dmgRollMod, sl3);
+                        longRangeWound += getWounds(dmgRollMod, sl3, tough);
                     }
                 }
             }
@@ -301,6 +304,9 @@ btnCalcRanged!.addEventListener('click', () => {
         }
         if (combo) {
             text += ' | Combo Attack';
+        }
+        if (tough) {
+            text += ' | Tough (' + tough + ')';
         }
 
         const caption = table.createCaption();
