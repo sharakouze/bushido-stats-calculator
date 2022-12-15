@@ -83,34 +83,13 @@ function getWounds(dmgRollMod: number, sl: number) {
         dmgRollMod = 12;
     }
 
-    let w = 0;
+    const dmgMod = [0, 0, -3, -2, -1, -1, 0, 0, 0, 1, 1, 2, 3];
+    const wounds = sl + dmgMod[dmgRollMod];
 
-    if (dmgRollMod === 2) {
-        w = sl - 3;
-    }
-    else if (dmgRollMod === 3) {
-        w = sl - 2;
-    }
-    else if (dmgRollMod === 4 || dmgRollMod === 5) {
-        w = sl - 1;
-    }
-    else if (dmgRollMod === 6 || dmgRollMod === 7 || dmgRollMod === 8) {
-        w = sl;
-    }
-    else if (dmgRollMod === 9 || dmgRollMod === 10) {
-        w = sl + 1;
-    }
-    else if (dmgRollMod === 11) {
-        w = sl + 2;
-    }
-    else if (dmgRollMod === 12) {
-        w = sl + 3;
-    }
-
-    if (w < 0) {
+    if (wounds < 0) {
         return 0;
     }
-    return w;
+    return wounds;
 }
 
 function getMedian(arr: number[]): number {
@@ -215,7 +194,7 @@ function renderRangedTable(shortRangeWounds: number[], mediumRangeWounds: number
     return table;
 }
 
-const SIM_COUNT = 100000;
+const SIM_COUNT = 10;
 
 const btnCalcRanged = document.getElementById('ranged-calc');
 btnCalcRanged!.addEventListener('click', () => {

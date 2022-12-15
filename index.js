@@ -75,32 +75,15 @@ function getWounds(dmgRollMod, sl) {
     if (dmgRollMod > 12) {
         dmgRollMod = 12;
     }
-    let w = 0;
-    if (dmgRollMod === 2) {
-        w = sl - 3;
-    }
-    else if (dmgRollMod === 3) {
-        w = sl - 2;
-    }
-    else if (dmgRollMod === 4 || dmgRollMod === 5) {
-        w = sl - 1;
-    }
-    else if (dmgRollMod === 6 || dmgRollMod === 7 || dmgRollMod === 8) {
-        w = sl;
-    }
-    else if (dmgRollMod === 9 || dmgRollMod === 10) {
-        w = sl + 1;
-    }
-    else if (dmgRollMod === 11) {
-        w = sl + 2;
-    }
-    else if (dmgRollMod === 12) {
-        w = sl + 3;
-    }
-    if (w < 0) {
+    const dmgMod = [0, 0, -3, -2, -1, -1, 0, 0, 0, 1, 1, 2, 3];
+    const wounds = sl + dmgMod[dmgRollMod];
+    console.log('dmgRollMod', dmgRollMod);
+    console.log('sl', sl);
+    console.log('wounds', wounds);
+    if (wounds < 0) {
         return 0;
     }
-    return w;
+    return wounds;
 }
 function getMedian(arr) {
     if (arr.length == 0) {
@@ -189,7 +172,7 @@ function renderRangedTable(shortRangeWounds, mediumRangeWounds, longRangeWounds)
     row3cell3.innerText = String(longRangeStdDev.toFixed(2));
     return table;
 }
-const SIM_COUNT = 100000;
+const SIM_COUNT = 10;
 const btnCalcRanged = document.getElementById('ranged-calc');
 btnCalcRanged.addEventListener('click', () => {
     const form = document.querySelector('#form-ranged');
