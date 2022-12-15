@@ -21,25 +21,14 @@
                 <form id="form-ranged">
                     <h6 class="card-subtitle mb-2 text-muted">Attacker</h6>
                     <div class="row gx-3">
-                        <div class="col-12 col-lg-4">
+                        <div class="col-12 col-sm-6">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control" id="ranged-pool"
-                                    placeholder="Ranged Pool Statistic" required min="1">
-                                <label>Ranged Pool Statistic</label>
+                                <input type="number" class="form-control" id="ranged-pool" placeholder="Ranged Pool"
+                                    required min="1">
+                                <label>Ranged Pool</label>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="input-group mb-3">
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="ranged-att-modifier"
-                                        placeholder="Attack Challenge Modifier">
-                                    <label>Attack Challenge Modifier</label>
-                                </div>
-                                <a href="#" class="input-group-text text-decoration-none"
-                                    title="2 for target in cover, -2 for large target..." data-bs-toggle="tooltip">?</a>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="col-12 col-sm-6">
                             <div class="input-group mb-3">
                                 <div class="form-floating">
                                     <input type="number" class="form-control" id="ranged-dmg-modifier"
@@ -68,11 +57,12 @@
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="form-floating mb-3">
-                                <select class="form-control" id="ranged-strong">
-                                    <option value="0">No</option>
-                                    <option value="1">Yes</option>
+                                <select class="form-control" id="ranged-strong-weak">
+                                    <option value="0">None</option>
+                                    <option value="1">Strong</option>
+                                    <option value="2">Weak</option>
                                 </select>
-                                <label>Strong</label>
+                                <label>Strong or Weak</label>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
@@ -86,19 +76,138 @@
                         </div>
                     </div>
                     <h6 class="card-subtitle mb-2 text-muted">Target</h6>
-                    <div class="form-floating mb-3">
-                        <input type="number" class="form-control" id="ranged-tough" placeholder="Tough">
-                        <label>Tough</label>
+                    <div class="row gx-3">
+                        <div class="col-12 col-sm-6">
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="ranged-att-modifier"
+                                        placeholder="Attack Challenge Modifier">
+                                    <label>Attack Challenge Modifier</label>
+                                </div>
+                                <a href="#" class="input-group-text text-decoration-none"
+                                    title="2 for target in cover, -2 for large target..." data-bs-toggle="tooltip">?</a>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="ranged-tough" placeholder="Tough">
+                                <label>Tough</label>
+                            </div>
+                        </div>
                     </div>
                 </form>
-                <button type="submit" class="btn btn-primary" id="ranged-calc">Calculate</button>
+                <button class="btn btn-primary" id="ranged-calc">Calculate</button>
                 <div id="ranged-result-container"></div>
             </div>
         </div>
-        <div class="card mt-3 invisible">
+        <div class="card mt-3">
             <h5 class="card-header">Melee Exchange</h5>
             <div class="card-body">
-
+                <form id="form-melee">
+                    <h6 class="card-subtitle mb-2 text-muted">Attacker</h6>
+                    <div class="row gx-3">
+                        <div class="col-12 col-sm-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-att-pool" placeholder="Attack Pool"
+                                    required min="1">
+                                <label>Attack Pool</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="melee-dmg-modifier"
+                                        placeholder="Damage Modifier">
+                                    <label>Damage Modifier</label>
+                                </div>
+                                <a href="#" class="input-group-text text-decoration-none"
+                                    title="Weapon strength, armour, pierce..." data-bs-toggle="tooltip">?</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gx-3">
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-brutal" placeholder="Brutal"
+                                    min="0">
+                                <label>Brutal</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-att-prowess" placeholder="Prowess"
+                                    min="0">
+                                <label>Prowess</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <select class="form-control" id="melee-strong-weak">
+                                    <option value="0">None</option>
+                                    <option value="1">Strong</option>
+                                    <option value="2">Weak</option>
+                                </select>
+                                <label>Strong or Weak</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <select class="form-control" id="melee-combo">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <label>Combo Attack</label>
+                            </div>
+                        </div>
+                    </div>
+                    <h6 class="card-subtitle mb-2 text-muted">Defender</h6>
+                    <div class="row gx-3">
+                        <div class="col-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-def-pool"
+                                    placeholder="Defence Pool">
+                                <label>Defence Pool</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-tough" placeholder="Tough">
+                                <label>Tough</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gx-3">
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-def-prowess" placeholder="Prowess">
+                                <label>Prowess</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-parry" placeholder="Parry">
+                                <label>Parry</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-dodge" placeholder="Dodge">
+                                <label>Dodge</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <select class="form-control" id="melee-kata">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <label>Kata</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <button class="btn btn-primary" id="melee-calc">Calculate</button>
+                <div id="melee-result-container"></div>
             </div>
         </div>
     </div>

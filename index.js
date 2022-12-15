@@ -28,14 +28,16 @@ function rerollProwess(dices, count) {
         dices[index] = dice;
     }
 }
-function getTestResult(dices) {
-    let i = 0;
-    while (i < dices.length) {
-        if (dices[i] === 1) {
-            dices.splice(i, 1);
-        }
-        else {
-            ++i;
+function getTestResult(dices, kata) {
+    if (!kata) {
+        let i = 0;
+        while (i < dices.length) {
+            if (dices[i] === 1) {
+                dices.splice(i, 1);
+            }
+            else {
+                ++i;
+            }
         }
     }
     if (dices.length === 0) {
@@ -185,8 +187,9 @@ btnCalcRanged.addEventListener('click', () => {
         const attModifier = Number(inputAttModifier.value);
         const selectCombo = document.querySelector('#ranged-combo');
         const combo = Boolean(Number(selectCombo.value));
-        const selectStrong = document.querySelector('#ranged-strong');
-        const strong = Boolean(Number(selectStrong.value));
+        const selectStrongWeak = document.querySelector('#ranged-strong-weak');
+        const strong = Number(selectStrongWeak.value) === 1;
+        const weak = Number(selectStrongWeak.value) === 2;
         const inputDmgModifier = document.querySelector('#ranged-dmg-modifier');
         const dmgModifier = Number(inputDmgModifier.value);
         const inputTough = document.querySelector('#ranged-tough');
@@ -203,7 +206,7 @@ btnCalcRanged.addEventListener('click', () => {
             if (prowess) {
                 rerollProwess(attDices, prowess);
             }
-            const result = getTestResult(attDices);
+            const result = getTestResult(attDices, false);
             let shortRangeWound = 0;
             let mediumRangeWound = 0;
             let longRangeWound = 0;
@@ -222,6 +225,11 @@ btnCalcRanged.addEventListener('click', () => {
                         const dice3 = d6();
                         dmgDices.push(dice3);
                         dmgDices.sort((a, b) => b - a);
+                    }
+                    else if (weak) {
+                        const dice3 = d6();
+                        dmgDices.push(dice3);
+                        dmgDices.sort((a, b) => a - b);
                     }
                     const dmgRoll = dmgDices.slice(0, 2).reduce((a, b) => a + b);
                     const dmgRollMod = dmgRoll + dmgModifier;
@@ -252,6 +260,9 @@ btnCalcRanged.addEventListener('click', () => {
         if (strong) {
             text += ' | Strong';
         }
+        if (weak) {
+            text += ' | Weak';
+        }
         if (combo) {
             text += ' | Combo Attack';
         }
@@ -265,5 +276,81 @@ btnCalcRanged.addEventListener('click', () => {
             container.firstChild.remove();
         }
         container.appendChild(table);
+    }
+});
+const btnCalcMelee = document.getElementById('melee-calc');
+btnCalcMelee.addEventListener('click', () => {
+    const form = document.querySelector('#form-melee');
+    const valid = form.reportValidity();
+    if (valid) {
+        const inputAttPool = document.querySelector('#melee-att-pool');
+        const attPool = Number(inputAttPool.value);
+        const inputAttProwess = document.querySelector('#melee-att-prowess');
+        const attProwess = Number(inputAttProwess.value);
+        const selectAttKata = document.querySelector('#melee-att-kata');
+        const attKata = Boolean(Number(selectAttKata.value));
+        const inputDefProwess = document.querySelector('#melee-def-prowess');
+        const defProwess = Number(inputDefProwess.value);
+        const selectDefKata = document.querySelector('#melee-def-kata');
+        const defKata = Boolean(Number(selectDefKata.value));
+        const inputBrutal = document.querySelector('#melee-brutal');
+        const brutal = Number(inputBrutal.value);
+        const inputDefPool = document.querySelector('#melee-def-pool');
+        const defPool = Number(inputDefPool.value);
+        const selectCombo = document.querySelector('#melee-combo');
+        const combo = Boolean(Number(selectCombo.value));
+        const selectStrongWeak = document.querySelector('#melee-strong-weak');
+        const strong = Number(selectStrongWeak.value) === 1;
+        const weak = Number(selectStrongWeak.value) === 2;
+        const inputDmgModifier = document.querySelector('#melee-dmg-modifier');
+        const dmgModifier = Number(inputDmgModifier.value);
+        const inputTough = document.querySelector('#melee-tough');
+        const tough = Number(inputTough.value);
+        const wounds = [];
+        for (let x = 0; x < SIM_COUNT; x++) {
+            const attDices = [];
+            for (let i = 0; i < attPool; i++) {
+                const dice = d6();
+                attDices.push(dice);
+            }
+            if (attProwess) {
+                rerollProwess(attDices, attProwess);
+            }
+            const attResult = getTestResult(attDices, attKata);
+            let wound = 0;
+            if (attResult !== -1) {
+                const defDices = [];
+                for (let i = 0; i < defPool; i++) {
+                    const dice = d6();
+                    defDices.push(dice);
+                }
+                if (defProwess) {
+                    rerollProwess(defDices, defProwess);
+                }
+                const defResult = getTestResult(defDices, defKata);
+                const sl = attResult + brutal - defResult;
+                const sucessLevels = getSucessLevels(sl, combo);
+                for (let i = 0; i < sucessLevels.length; i++) {
+                    const dice1 = d6();
+                    const dice2 = d6();
+                    const dmgDices = [dice1, dice2];
+                    if (strong) {
+                        const dice3 = d6();
+                        dmgDices.push(dice3);
+                        dmgDices.sort((a, b) => b - a);
+                    }
+                    else if (weak) {
+                        const dice3 = d6();
+                        dmgDices.push(dice3);
+                        dmgDices.sort((a, b) => a - b);
+                    }
+                    const dmgRoll = dmgDices.slice(0, 2).reduce((a, b) => a + b);
+                    const dmgRollMod = dmgRoll + dmgModifier;
+                    const sl = sucessLevels[i];
+                    wound += getWounds(dmgRollMod, sl, tough);
+                }
+            }
+            wounds.push(wound);
+        }
     }
 });
