@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bushido stats calculator</title>
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="text-center my-2">
+            <img src="images/bushidorisensun.png" style="height: 6rem;">
+            <span class="fw-bold">stats calculator</span>
+        </div>
+        <div class="card">
+            <h5 class="card-header">Ranged Attack</h5>
+            <div class="card-body">
+                <form id="form-ranged">
+                    <div class="row gx-3">
+                        <div class="col-12 col-md-4">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="ranged-pool"
+                                    placeholder="Ranged Pool Statistic" required min="1">
+                                <label>Ranged Pool Statistic</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="ranged-att-modifier"
+                                        placeholder="Attack Challenge Modifier">
+                                    <label>Attack Challenge Modifier</label>
+                                </div>
+                                <a href="#" class="input-group-text text-decoration-none"
+                                    title="2 for target in cover, -2 for large target..." data-bs-toggle="tooltip">?</a>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="ranged-dmg-modifier"
+                                        placeholder="Damage Modifier">
+                                    <label>Damage Modifier</label>
+                                </div>
+                                <a href="#" class="input-group-text text-decoration-none"
+                                    title="Weapon strength, armour, pierce..." data-bs-toggle="tooltip">?</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gx-3">
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="ranged-brutal" placeholder="Brutal"
+                                    min="0">
+                                <label>Brutal</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="ranged-prowess" placeholder="Prowess"
+                                    min="0">
+                                <label>Prowess</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <select class="form-control" id="ranged-strong">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <label>Strong</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <select class="form-control" id="ranged-combo">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <label>Combo Attack</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <button type="submit" class="btn btn-primary" id="ranged-calc">Calculate</button>
+                <div id="ranged-result-container"></div>
+            </div>
+        </div>
+    </div>
+    <script src="index.js" type="module"></script>
+    <script>
+        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltips.forEach(el => new bootstrap.Tooltip(el));
+    </script>
+</body>
+
+</html>
