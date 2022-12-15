@@ -77,9 +77,6 @@ function getWounds(dmgRollMod, sl) {
     }
     const dmgMod = [0, 0, -3, -2, -1, -1, 0, 0, 0, 1, 1, 2, 3];
     const wounds = sl + dmgMod[dmgRollMod];
-    console.log('dmgRollMod', dmgRollMod);
-    console.log('sl', sl);
-    console.log('wounds', wounds);
     if (wounds < 0) {
         return 0;
     }
@@ -172,7 +169,7 @@ function renderRangedTable(shortRangeWounds, mediumRangeWounds, longRangeWounds)
     row3cell3.innerText = String(longRangeStdDev.toFixed(2));
     return table;
 }
-const SIM_COUNT = 10;
+const SIM_COUNT = 100000;
 const btnCalcRanged = document.getElementById('ranged-calc');
 btnCalcRanged.addEventListener('click', () => {
     const form = document.querySelector('#form-ranged');

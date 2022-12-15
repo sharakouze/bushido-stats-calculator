@@ -194,7 +194,7 @@ function renderRangedTable(shortRangeWounds: number[], mediumRangeWounds: number
     return table;
 }
 
-const SIM_COUNT = 10;
+const SIM_COUNT = 100000;
 
 const btnCalcRanged = document.getElementById('ranged-calc');
 btnCalcRanged!.addEventListener('click', () => {
