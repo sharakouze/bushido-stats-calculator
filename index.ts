@@ -232,8 +232,44 @@ function renderMeleeTable(wounds: number[]): HTMLTableElement {
     const headrow = head.insertRow();
 
     const headcell0 = document.createElement('th');
-    headcell0.innerText = 'Wounds'
     headrow.appendChild(headcell0);
+
+    const headcell1 = document.createElement('th');
+    headcell1.innerText = 'Wounds'
+    headcell1.scope = 'col';
+    headrow.appendChild(headcell1);
+
+    const body = table.createTBody();
+
+    const median = getMedian(wounds);
+
+    const bodyrow1 = body.insertRow();
+    const row1cell0 = document.createElement('th');
+    row1cell0.innerText = 'Median';
+    row1cell0.scope = 'row';
+    bodyrow1.appendChild(row1cell0);
+    const row1cell1 = bodyrow1.insertCell();
+    row1cell1.innerText = String(median);
+
+    const average = getAverage(wounds);
+
+    const bodyrow2 = body.insertRow();
+    const row2cell0 = document.createElement('th');
+    row2cell0.innerText = 'Average';
+    row2cell0.scope = 'row';
+    bodyrow2.appendChild(row2cell0);
+    const row2cell1 = bodyrow2.insertCell();
+    row2cell1.innerText = String(average.toFixed(2));
+
+    const stddev = getStandardDeviation(wounds);
+
+    const bodyrow3 = body.insertRow();
+    const row3cell0 = document.createElement('th');
+    row3cell0.innerText = 'Standard deviation';
+    row3cell0.scope = 'row';
+    bodyrow3.appendChild(row3cell0);
+    const row3cell1 = bodyrow3.insertCell();
+    row3cell1.innerText = String(stddev.toFixed(2));
 
     return table;
 }
@@ -477,5 +513,13 @@ btnCalcMelee!.addEventListener('click', () => {
 
             wounds.push(wound);
         }
+
+        const table = renderMeleeTable(wounds);
+
+        const container = document.getElementById('melee-result-container');
+        while (container!.firstChild) {
+            container!.firstChild.remove();
+        }
+        container!.appendChild(table);
     }
 });

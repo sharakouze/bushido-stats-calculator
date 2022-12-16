@@ -17,7 +17,7 @@ function rerollProwess(dices, count) {
     if (count > 0) {
         const max = Math.max(...dices);
         if (max !== 6) {
-            const target = dices.length > 3 ? 5 : 4;
+            const target = (dices.length - rerolls.length > 3) ? 5 : 4;
             if (max <= target) {
                 const min = Math.min(...dices);
                 while (count > 0) {
@@ -30,6 +30,21 @@ function rerollProwess(dices, count) {
                 }
             }
         }
+    }
+    for (const index of rerolls) {
+        const dice = d6();
+        dices[index] = dice;
+    }
+}
+function rerollDodge(dices, count) {
+    const rerolls = [];
+    while (count > 0) {
+        const index = dices.indexOf(6);
+        if (index === -1) {
+            break;
+        }
+        rerolls.push(index);
+        count--;
     }
     for (const index of rerolls) {
         const dice = d6();
@@ -179,6 +194,44 @@ function renderRangedTable(shortRangeWounds, mediumRangeWounds, longRangeWounds)
     row3cell3.innerText = String(longRangeStdDev.toFixed(2));
     return table;
 }
+function renderMeleeTable(wounds) {
+    const table = document.createElement('table');
+    table.classList.add('table');
+    const head = table.createTHead();
+    const headrow = head.insertRow();
+    const headcell0 = document.createElement('th');
+    headrow.appendChild(headcell0);
+    const headcell1 = document.createElement('th');
+    headcell1.innerText = 'Wounds';
+    headcell1.scope = 'col';
+    headrow.appendChild(headcell1);
+    const body = table.createTBody();
+    const median = getMedian(wounds);
+    const bodyrow1 = body.insertRow();
+    const row1cell0 = document.createElement('th');
+    row1cell0.innerText = 'Median';
+    row1cell0.scope = 'row';
+    bodyrow1.appendChild(row1cell0);
+    const row1cell1 = bodyrow1.insertCell();
+    row1cell1.innerText = String(median);
+    const average = getAverage(wounds);
+    const bodyrow2 = body.insertRow();
+    const row2cell0 = document.createElement('th');
+    row2cell0.innerText = 'Average';
+    row2cell0.scope = 'row';
+    bodyrow2.appendChild(row2cell0);
+    const row2cell1 = bodyrow2.insertCell();
+    row2cell1.innerText = String(average.toFixed(2));
+    const stddev = getStandardDeviation(wounds);
+    const bodyrow3 = body.insertRow();
+    const row3cell0 = document.createElement('th');
+    row3cell0.innerText = 'Standard deviation';
+    row3cell0.scope = 'row';
+    bodyrow3.appendChild(row3cell0);
+    const row3cell1 = bodyrow3.insertCell();
+    row3cell1.innerText = String(stddev.toFixed(2));
+    return table;
+}
 const SIM_COUNT = 100000;
 const btnCalcRanged = document.getElementById('ranged-calc');
 btnCalcRanged.addEventListener('click', () => {
@@ -293,6 +346,8 @@ btnCalcMelee.addEventListener('click', () => {
     if (valid) {
         const inputAttPool = document.querySelector('#melee-att-pool');
         const attPool = Number(inputAttPool.value);
+        const inputDodge = document.querySelector('#melee-dodge');
+        const dodge = Number(inputDodge.value);
         const inputAttProwess = document.querySelector('#melee-att-prowess');
         const attProwess = Number(inputAttProwess.value);
         const selectAttKata = document.querySelector('#melee-att-kata');
@@ -320,6 +375,9 @@ btnCalcMelee.addEventListener('click', () => {
             for (let i = 0; i < attPool; i++) {
                 const dice = d6();
                 attDices.push(dice);
+            }
+            if (dodge) {
+                rerollDodge(attDices, dodge);
             }
             if (attProwess) {
                 rerollProwess(attDices, attProwess);
@@ -360,5 +418,11 @@ btnCalcMelee.addEventListener('click', () => {
             }
             wounds.push(wound);
         }
+        const table = renderMeleeTable(wounds);
+        const container = document.getElementById('melee-result-container');
+        while (container.firstChild) {
+            container.firstChild.remove();
+        }
+        container.appendChild(table);
     }
 });
