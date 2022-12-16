@@ -6,23 +6,31 @@ function d6() {
 }
 function rerollProwess(dices, count) {
     const rerolls = [];
-    for (let i = 0; i < dices.length; i++) {
-        if (dices[i] === 1 && rerolls.length < count) {
-            rerolls.push(i);
+    while (count > 0) {
+        const index = dices.indexOf(1);
+        if (index === -1) {
+            break;
         }
+        rerolls.push(index);
+        count--;
     }
-    /*
-        if (rerolls.length < count) {
-            const max = Math.max(...dices);
-            if (max !== 6) {
-                for (let i = 0; i < dices.length; i++) {
-                    if (dices[i] === 1 && rerolls.length < count) {
-                        rerolls.push(i);
+    if (count > 0) {
+        const max = Math.max(...dices);
+        if (max !== 6) {
+            const target = dices.length > 3 ? 5 : 4;
+            if (max <= target) {
+                const min = Math.min(...dices);
+                while (count > 0) {
+                    const index = dices.indexOf(min);
+                    if (index === -1) {
+                        break;
                     }
+                    rerolls.push(index);
+                    count--;
                 }
             }
         }
-    */
+    }
     for (const index of rerolls) {
         const dice = d6();
         dices[index] = dice;
