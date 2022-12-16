@@ -7,28 +7,26 @@ function d6(): number {
 function rerollProwess(dices: number[], count: number): void {
     const rerolls: number[] = [];
 
-    while (count > 0) {
-        const index = dices.indexOf(1);
-        if (index === -1) {
-            break;
+    // reroll 1's
+    for (let i = 0; i < dices.length; i++) {
+        if (dices[i] === 1 && rerolls.length < count) {
+            rerolls.push(i);
         }
-        rerolls.push(index);
-        count--;
     }
 
-    if (count > 0) {
+    if (rerolls.length < count) {
+        // no need to risk rerolls if max dice is 6
         const max = Math.max(...dices);
         if (max !== 6) {
-            const target = (dices.length - rerolls.length > 3) ? 5 : 4;
-            if (max <= target) {
-                const min = Math.min(...dices);
-                while (count > 0) {
-                    const index = dices.indexOf(min);
-                    if (index === -1) {
-                        break;
+            // we risk to reroll dices only if the max dice is less or equals than 4 (or 5 if the pool is greater than 3 dices)
+            const targetMax = (dices.length - rerolls.length > 3) ? 5 : 4;
+            if (max <= targetMax) {
+                for (let n = 2; n <= 4; n++) {
+                    for (let i = 0; i < dices.length; i++) {
+                        if (dices[i] === n && rerolls.length < count) {
+                            rerolls.push(i);
+                        }
                     }
-                    rerolls.push(index);
-                    count--;
                 }
             }
         }
@@ -40,16 +38,14 @@ function rerollProwess(dices: number[], count: number): void {
     }
 }
 
-function rerollDodge(dices: number[], count: number): void {
+function rerollDodgeFeint(dices: number[], count: number): void {
     const rerolls: number[] = [];
 
-    while (count > 0) {
-        const index = dices.indexOf(6);
-        if (index === -1) {
-            break;
+    // reroll 6's
+    for (let i = 0; i < dices.length; i++) {
+        if (dices[i] === 6 && rerolls.length < count) {
+            rerolls.push(i);
         }
-        rerolls.push(index);
-        count--;
     }
 
     for (const index of rerolls) {
@@ -429,11 +425,17 @@ btnCalcMelee!.addEventListener('click', () => {
         const inputDefProwess = document.querySelector<HTMLInputElement>('#melee-def-prowess');
         const defProwess = Number(inputDefProwess!.value);
 
+        const inputFeint = document.querySelector<HTMLInputElement>('#melee-feint');
+        const feint = Number(inputFeint!.value);
+
         const selectDefKata = document.querySelector<HTMLInputElement>('#melee-def-kata');
         const defKata = Boolean(Number(selectDefKata!.value));
 
         const inputBrutal = document.querySelector<HTMLInputElement>('#melee-brutal');
         const brutal = Number(inputBrutal!.value);
+
+        const inputParry = document.querySelector<HTMLInputElement>('#melee-parry');
+        const parry = Number(inputParry!.value);
 
         const inputDefPool = document.querySelector<HTMLInputElement>('#melee-def-pool');
         const defPool = Number(inputDefPool!.value);
@@ -461,7 +463,7 @@ btnCalcMelee!.addEventListener('click', () => {
             }
 
             if (dodge) {
-                rerollDodge(attDices, dodge);
+                rerollDodgeFeint(attDices, dodge);
             }
             if (attProwess) {
                 rerollProwess(attDices, attProwess);
@@ -481,10 +483,13 @@ btnCalcMelee!.addEventListener('click', () => {
                 if (defProwess) {
                     rerollProwess(defDices, defProwess);
                 }
+                if (feint) {
+                    rerollDodgeFeint(defDices, feint);
+                }
 
                 const defResult = getTestResult(defDices, defKata);
 
-                const sl = attResult + brutal - defResult;
+                const sl = defResult === -1 ? attResult + brutal : attResult + brutal - (defResult + parry);
                 const sucessLevels = getSucessLevels(sl, combo);
 
                 for (let i = 0; i < sucessLevels.length; i++) {

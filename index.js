@@ -6,27 +6,22 @@ function d6() {
 }
 function rerollProwess(dices, count) {
     const rerolls = [];
-    while (count > 0) {
-        const index = dices.indexOf(1);
-        if (index === -1) {
-            break;
+    for (let i = 0; i < dices.length; i++) {
+        if (dices[i] === 1 && rerolls.length < count) {
+            rerolls.push(i);
         }
-        rerolls.push(index);
-        count--;
     }
-    if (count > 0) {
+    if (rerolls.length < count) {
         const max = Math.max(...dices);
         if (max !== 6) {
-            const target = (dices.length - rerolls.length > 3) ? 5 : 4;
-            if (max <= target) {
-                const min = Math.min(...dices);
-                while (count > 0) {
-                    const index = dices.indexOf(min);
-                    if (index === -1) {
-                        break;
+            const targetMax = (dices.length - rerolls.length > 3) ? 5 : 4;
+            if (max <= targetMax) {
+                for (let n = 2; n <= 4; n++) {
+                    for (let i = 0; i < dices.length; i++) {
+                        if (dices[i] === n && rerolls.length < count) {
+                            rerolls.push(i);
+                        }
                     }
-                    rerolls.push(index);
-                    count--;
                 }
             }
         }
@@ -36,7 +31,7 @@ function rerollProwess(dices, count) {
         dices[index] = dice;
     }
 }
-function rerollDodge(dices, count) {
+function rerollDodgeFeint(dices, count) {
     const rerolls = [];
     while (count > 0) {
         const index = dices.indexOf(6);
@@ -354,10 +349,14 @@ btnCalcMelee.addEventListener('click', () => {
         const attKata = Boolean(Number(selectAttKata.value));
         const inputDefProwess = document.querySelector('#melee-def-prowess');
         const defProwess = Number(inputDefProwess.value);
+        const inputFeint = document.querySelector('#melee-feint');
+        const feint = Number(inputFeint.value);
         const selectDefKata = document.querySelector('#melee-def-kata');
         const defKata = Boolean(Number(selectDefKata.value));
         const inputBrutal = document.querySelector('#melee-brutal');
         const brutal = Number(inputBrutal.value);
+        const inputParry = document.querySelector('#melee-parry');
+        const parry = Number(inputParry.value);
         const inputDefPool = document.querySelector('#melee-def-pool');
         const defPool = Number(inputDefPool.value);
         const selectCombo = document.querySelector('#melee-combo');
@@ -377,7 +376,7 @@ btnCalcMelee.addEventListener('click', () => {
                 attDices.push(dice);
             }
             if (dodge) {
-                rerollDodge(attDices, dodge);
+                rerollDodgeFeint(attDices, dodge);
             }
             if (attProwess) {
                 rerollProwess(attDices, attProwess);
@@ -393,8 +392,11 @@ btnCalcMelee.addEventListener('click', () => {
                 if (defProwess) {
                     rerollProwess(defDices, defProwess);
                 }
+                if (feint) {
+                    rerollDodgeFeint(defDices, feint);
+                }
                 const defResult = getTestResult(defDices, defKata);
-                const sl = attResult + brutal - defResult;
+                const sl = defResult === -1 ? attResult + brutal : attResult + brutal - (defResult + parry);
                 const sucessLevels = getSucessLevels(sl, combo);
                 for (let i = 0; i < sucessLevels.length; i++) {
                     const dice1 = d6();
