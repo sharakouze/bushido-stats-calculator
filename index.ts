@@ -501,6 +501,31 @@ btnCalcMelee!.addEventListener('click', () => {
 
         const table = renderMeleeTable(hits, wounds);
 
+        let text = 'Att. Pool ' + attPool + ' | Def. Pool ' + defPool + ' | Damage mod. ' + dmgModifier;
+        if (brutal) {
+            text += ' | Brutal (' + brutal + ')';
+        }
+        if (attProwess) {
+            text += ' | Prowess [Attack] (' + attProwess + ')';
+        }
+        if (defProwess) {
+            text += ' | Prowess [Defence] (' + defProwess + ')';
+        }
+        if (strong) {
+            text += ' | Strong';
+        }
+        if (weak) {
+            text += ' | Weak';
+        }
+        if (combo) {
+            text += ' | Combo Attack';
+        }
+        if (tough) {
+            text += ' | Tough (' + tough + ')';
+        }
+
+        const caption = table.createCaption();
+        caption.innerText = text;
         const container = document.getElementById('melee-result-container');
         while (container!.firstChild) {
             container!.firstChild.remove();
