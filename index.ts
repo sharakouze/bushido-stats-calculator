@@ -431,6 +431,8 @@ btnCalcMelee!.addEventListener('click', () => {
         const inputTough = document.querySelector<HTMLInputElement>('#melee-tough');
         const tough = Number(inputTough!.value);
 
+        const attackerActive = true;
+
         const hits: boolean[] = [];
         const wounds: number[] = [];
 
@@ -469,7 +471,16 @@ btnCalcMelee!.addEventListener('click', () => {
 
                 const defResult = getTestResult(defDices, defKata);
 
-                const sl = defResult === -1 ? attResult + brutal : attResult + brutal - (defResult + parry);
+                let sl = (defResult === -1) ? attResult + brutal : attResult + brutal - (defResult + parry);
+                if (sl === 0) {
+                    if (attDices.length < defDices.length) {
+                        sl = -1;
+                    }
+                    else if (attDices.length === defDices.length && !attackerActive) {
+                        sl = -1;
+                    }
+                }
+
                 const sucessLevels = getSucessLevels(sl, combo);
 
                 hit = sucessLevels.length ? true : false;
