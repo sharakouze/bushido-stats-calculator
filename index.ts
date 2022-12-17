@@ -157,54 +157,8 @@ function insertCell(tr: HTMLTableRowElement, text?: string) {
     }
 }
 
-function renderRangedTable(shortRangeWounds: number[], mediumRangeWounds: number[], longRangeWounds: number[]): HTMLTableElement {
-    const table = document.createElement('table');
-    table.classList.add('table');
-
-    const head = table.createTHead();
-
-    const headrow1 = head.insertRow();
-    insertThCell(headrow1, 'Wounds');
-    insertThCell(headrow1, 'Short range');
-    insertThCell(headrow1, 'Medium range');
-    insertThCell(headrow1, 'Long range');
-
-    const body = table.createTBody();
-
-    const shortRangeMedian = getMedian(shortRangeWounds);
-    const mediumRangeMedian = getMedian(mediumRangeWounds);
-    const longRangeMedian = getMedian(longRangeWounds);
-
-    const bodyrow1 = body.insertRow();
-    insertThCell(bodyrow1, 'Median');
-    insertCell(bodyrow1, String(shortRangeMedian));
-    insertCell(bodyrow1, String(mediumRangeMedian));
-    insertCell(bodyrow1, String(longRangeMedian));
-
-    const shortRangeAverage = getAverage(shortRangeWounds);
-    const mediumRangeAverage = getAverage(mediumRangeWounds);
-    const longRangeAverage = getAverage(longRangeWounds);
-
-    const bodyrow2 = body.insertRow();
-    insertThCell(bodyrow2, 'Average');
-    insertCell(bodyrow2, String(shortRangeAverage.toFixed(2)));
-    insertCell(bodyrow2, String(mediumRangeAverage.toFixed(2)));
-    insertCell(bodyrow2, String(longRangeAverage.toFixed(2)));
-
-    const shortRangeStdDev = getStandardDeviation(shortRangeWounds);
-    const mediumRangeStdDev = getStandardDeviation(mediumRangeWounds);
-    const longRangeStdDev = getStandardDeviation(longRangeWounds);
-
-    const bodyrow3 = body.insertRow();
-    insertThCell(bodyrow3, 'Standard deviation');
-    insertCell(bodyrow3, String(shortRangeStdDev.toFixed(2)));
-    insertCell(bodyrow3, String(mediumRangeStdDev.toFixed(2)));
-    insertCell(bodyrow3, String(longRangeStdDev.toFixed(2)));
-
-    return table;
-}
-
-function renderMeleeTable(hits: number[], wounds: number[]): HTMLTableElement {
+function renderRangedTable(shortRangeHits: boolean[], mediumRangeHits: boolean[], longRangeHits: boolean[],
+    shortRangeWounds: number[], mediumRangeWounds: number[], longRangeWounds: number[]): HTMLTableElement {
     const table = document.createElement('table');
     table.classList.add('table');
 
@@ -212,32 +166,68 @@ function renderMeleeTable(hits: number[], wounds: number[]): HTMLTableElement {
 
     const headrow1 = head.insertRow();
     insertThCell(headrow1);
-    insertThCell(headrow1, 'Hit Rate');
-    insertThCell(headrow1, 'Wounds');
+    insertThCell(headrow1, 'Hit rate');
+    insertThCell(headrow1, 'Median wounds');
+    insertThCell(headrow1, 'Average wounds');
 
     const body = table.createTBody();
 
-    const median = getMedian(wounds);
+    const shortRangeHitRate = getAverage(shortRangeHits.map(x => x ? 100 : 0));
+    const shortRangeMedianW = getMedian(shortRangeWounds);
+    const shortRangeAvgW = getAverage(shortRangeWounds);
 
     const bodyrow1 = body.insertRow();
-    insertThCell(bodyrow1, 'Median');
-    insertCell(bodyrow1);
-    insertCell(bodyrow1, String(median));
+    insertThCell(bodyrow1, 'Short range');
+    insertCell(bodyrow1, String(shortRangeHitRate.toFixed(1)) + '%');
+    insertCell(bodyrow1, String(shortRangeMedianW));
+    insertCell(bodyrow1, String(shortRangeAvgW.toFixed(2)));
 
-    const averageHit = getAverage(hits) * 100;
-    const averageWounds = getAverage(wounds);
+    const mediumRangeHitRate = getAverage(mediumRangeHits.map(x => x ? 100 : 0));
+    const mediumRangeMedianW = getMedian(mediumRangeWounds);
+    const mediumRangeAvgW = getAverage(mediumRangeWounds);
 
     const bodyrow2 = body.insertRow();
-    insertThCell(bodyrow2, 'Average');
-    insertCell(bodyrow2, String(averageHit.toFixed(2)) + '%');
-    insertCell(bodyrow2, String(averageWounds.toFixed(2)));
+    insertThCell(bodyrow2, 'Medium range');
+    insertCell(bodyrow2, String(mediumRangeHitRate.toFixed(1)) + '%');
+    insertCell(bodyrow2, String(mediumRangeMedianW));
+    insertCell(bodyrow2, String(mediumRangeAvgW.toFixed(2)));
 
-    const stddev = getStandardDeviation(wounds);
+    const longRangeHitRate = getAverage(longRangeHits.map(x => x ? 100 : 0));
+    const longRangeMedianW = getMedian(longRangeWounds);
+    const longRangeAvgW = getAverage(longRangeWounds);
 
     const bodyrow3 = body.insertRow();
-    insertThCell(bodyrow3, 'Standard deviation');
-    insertCell(bodyrow3);
-    insertCell(bodyrow3, String(stddev.toFixed(2)));
+    insertThCell(bodyrow3, 'Long range');
+    insertCell(bodyrow3, String(longRangeHitRate.toFixed(1)) + '%');
+    insertCell(bodyrow3, String(longRangeMedianW));
+    insertCell(bodyrow3, String(longRangeAvgW.toFixed(2)));
+
+    return table;
+}
+
+function renderMeleeTable(hits: boolean[], wounds: number[]): HTMLTableElement {
+    const table = document.createElement('table');
+    table.classList.add('table');
+
+    const head = table.createTHead();
+
+    const headrow1 = head.insertRow();
+    insertThCell(headrow1);
+    insertThCell(headrow1, 'Hit rate');
+    insertThCell(headrow1, 'Median wounds');
+    insertThCell(headrow1, 'Average wounds');
+
+    const body = table.createTBody();
+
+    const hitRate = getAverage(hits.map(x => x ? 100 : 0));
+    const medianWounds = getMedian(wounds);
+    const averageWounds = getAverage(wounds);
+
+    const bodyrow1 = body.insertRow();
+    insertThCell(bodyrow1, 'Melee');
+    insertCell(bodyrow1, String(hitRate.toFixed(1)) + '%');
+    insertCell(bodyrow1, String(medianWounds));
+    insertCell(bodyrow1, String(averageWounds.toFixed(2)));
 
     return table;
 }
@@ -274,6 +264,10 @@ btnCalcRanged!.addEventListener('click', () => {
         const inputTough = document.querySelector<HTMLInputElement>('#ranged-tough');
         const tough = Number(inputTough!.value);
 
+        const shortRangeHits: boolean[] = [];
+        const mediumRangeHits: boolean[] = [];
+        const longRangeHits: boolean[] = [];
+
         const shortRangeWounds: number[] = [];
         const mediumRangeWounds: number[] = [];
         const longRangeWounds: number[] = [];
@@ -291,6 +285,10 @@ btnCalcRanged!.addEventListener('click', () => {
 
             const result = getTestResult(attDices, false);
 
+            let shortRangeHit = false;
+            let mediumRangeHit = false;
+            let longRangeHit = false;
+
             let shortRangeWound = 0;
             let mediumRangeWound = 0;
             let longRangeWound = 0;
@@ -304,6 +302,10 @@ btnCalcRanged!.addEventListener('click', () => {
 
                 const sl3 = result + brutal - (6 + attModifier);
                 const longRangeSLs = getSucessLevels(sl3, combo);
+
+                shortRangeHit = shortRangeSLs.length ? true : false;
+                mediumRangeHit = mediumRangeSLs.length ? true : false;
+                longRangeHit = longRangeSLs.length ? true : false;
 
                 for (let i = 0; i < shortRangeSLs.length; i++) {
                     const dice1 = d6();
@@ -339,12 +341,16 @@ btnCalcRanged!.addEventListener('click', () => {
                 }
             }
 
+            shortRangeHits.push(shortRangeHit);
+            mediumRangeHits.push(mediumRangeHit);
+            longRangeHits.push(longRangeHit);
+
             shortRangeWounds.push(shortRangeWound);
             mediumRangeWounds.push(mediumRangeWound);
             longRangeWounds.push(longRangeWound);
         }
 
-        const table = renderRangedTable(shortRangeWounds, mediumRangeWounds, longRangeWounds);
+        const table = renderRangedTable(shortRangeHits, mediumRangeHits, longRangeHits, shortRangeWounds, mediumRangeWounds, longRangeWounds);
 
         let text = 'Pool ' + pool + ' | Attack Challenge mod. ' + attModifier + ' | Damage mod. ' + dmgModifier;
         if (brutal) {
@@ -425,7 +431,7 @@ btnCalcMelee!.addEventListener('click', () => {
         const inputTough = document.querySelector<HTMLInputElement>('#melee-tough');
         const tough = Number(inputTough!.value);
 
-        const hits: number[] = [];
+        const hits: boolean[] = [];
         const wounds: number[] = [];
 
         for (let x = 0; x < SIM_COUNT; x++) {
@@ -444,6 +450,7 @@ btnCalcMelee!.addEventListener('click', () => {
 
             const attResult = getTestResult(attDices, attKata);
 
+            let hit = false;
             let wound = 0;
 
             if (attResult !== -1) {
@@ -465,12 +472,7 @@ btnCalcMelee!.addEventListener('click', () => {
                 const sl = defResult === -1 ? attResult + brutal : attResult + brutal - (defResult + parry);
                 const sucessLevels = getSucessLevels(sl, combo);
 
-                if (sucessLevels.length) {
-                    hits.push(1);
-                }
-                else {
-                    hits.push(0);
-                }
+                hit = sucessLevels.length ? true : false;
 
                 for (let i = 0; i < sucessLevels.length; i++) {
                     const dice1 = d6();
@@ -496,6 +498,7 @@ btnCalcMelee!.addEventListener('click', () => {
                 }
             }
 
+            hits.push(hit);
             wounds.push(wound);
         }
 
