@@ -143,29 +143,31 @@ function getStandardDeviation(arr: number[]): number {
     return Math.sqrt(arr.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
 }
 
+function insertThCell(tr: HTMLTableRowElement, text?: string) {
+    const th = document.createElement('th');
+    if (text) {
+        th.innerText = text;
+    }
+    tr.appendChild(th);
+}
+function insertCell(tr: HTMLTableRowElement, text?: string) {
+    const td = tr.insertCell();
+    if (text) {
+        td.innerText = text;
+    }
+}
+
 function renderRangedTable(shortRangeWounds: number[], mediumRangeWounds: number[], longRangeWounds: number[]): HTMLTableElement {
     const table = document.createElement('table');
     table.classList.add('table');
 
     const head = table.createTHead();
-    const headrow = head.insertRow();
 
-    const headcell0 = document.createElement('th');
-    headcell0.innerText = 'Wounds'
-    headrow.appendChild(headcell0);
-
-    const headcell1 = document.createElement('th');
-    headcell1.innerText = 'Short range'
-    headcell1.scope = 'col';
-    headrow.appendChild(headcell1);
-    const headcell2 = document.createElement('th');
-    headcell2.innerText = 'Medium range'
-    headcell2.scope = 'col';
-    headrow.appendChild(headcell2);
-    const headcell3 = document.createElement('th');
-    headcell3.innerText = 'Long range'
-    headcell3.scope = 'col';
-    headrow.appendChild(headcell3);
+    const headrow1 = head.insertRow();
+    insertThCell(headrow1, 'Wounds');
+    insertThCell(headrow1, 'Short range');
+    insertThCell(headrow1, 'Medium range');
+    insertThCell(headrow1, 'Long range');
 
     const body = table.createTBody();
 
@@ -174,98 +176,68 @@ function renderRangedTable(shortRangeWounds: number[], mediumRangeWounds: number
     const longRangeMedian = getMedian(longRangeWounds);
 
     const bodyrow1 = body.insertRow();
-    const row1cell0 = document.createElement('th');
-    row1cell0.innerText = 'Median';
-    row1cell0.scope = 'row';
-    bodyrow1.appendChild(row1cell0);
-    const row1cell1 = bodyrow1.insertCell();
-    row1cell1.innerText = String(shortRangeMedian);
-    const row1cell2 = bodyrow1.insertCell();
-    row1cell2.innerText = String(mediumRangeMedian);
-    const row1cell3 = bodyrow1.insertCell();
-    row1cell3.innerText = String(longRangeMedian);
+    insertThCell(bodyrow1, 'Median');
+    insertCell(bodyrow1, String(shortRangeMedian));
+    insertCell(bodyrow1, String(mediumRangeMedian));
+    insertCell(bodyrow1, String(longRangeMedian));
 
     const shortRangeAverage = getAverage(shortRangeWounds);
     const mediumRangeAverage = getAverage(mediumRangeWounds);
     const longRangeAverage = getAverage(longRangeWounds);
 
     const bodyrow2 = body.insertRow();
-    const row2cell0 = document.createElement('th');
-    row2cell0.innerText = 'Average';
-    row2cell0.scope = 'row';
-    bodyrow2.appendChild(row2cell0);
-    const row2cell1 = bodyrow2.insertCell();
-    row2cell1.innerText = String(shortRangeAverage.toFixed(2));
-    const row2cell2 = bodyrow2.insertCell();
-    row2cell2.innerText = String(mediumRangeAverage.toFixed(2));
-    const row2cell3 = bodyrow2.insertCell();
-    row2cell3.innerText = String(longRangeAverage.toFixed(2));
+    insertThCell(bodyrow2, 'Average');
+    insertCell(bodyrow2, String(shortRangeAverage.toFixed(2)));
+    insertCell(bodyrow2, String(mediumRangeAverage.toFixed(2)));
+    insertCell(bodyrow2, String(longRangeAverage.toFixed(2)));
 
     const shortRangeStdDev = getStandardDeviation(shortRangeWounds);
     const mediumRangeStdDev = getStandardDeviation(mediumRangeWounds);
     const longRangeStdDev = getStandardDeviation(longRangeWounds);
 
     const bodyrow3 = body.insertRow();
-    const row3cell0 = document.createElement('th');
-    row3cell0.innerText = 'Standard deviation';
-    row3cell0.scope = 'row';
-    bodyrow3.appendChild(row3cell0);
-    const row3cell1 = bodyrow3.insertCell();
-    row3cell1.innerText = String(shortRangeStdDev.toFixed(2));
-    const row3cell2 = bodyrow3.insertCell();
-    row3cell2.innerText = String(mediumRangeStdDev.toFixed(2));
-    const row3cell3 = bodyrow3.insertCell();
-    row3cell3.innerText = String(longRangeStdDev.toFixed(2));
+    insertThCell(bodyrow3, 'Standard deviation');
+    insertCell(bodyrow3, String(shortRangeStdDev.toFixed(2)));
+    insertCell(bodyrow3, String(mediumRangeStdDev.toFixed(2)));
+    insertCell(bodyrow3, String(longRangeStdDev.toFixed(2)));
 
     return table;
 }
 
-function renderMeleeTable(wounds: number[]): HTMLTableElement {
+function renderMeleeTable(hits: number[], wounds: number[]): HTMLTableElement {
     const table = document.createElement('table');
     table.classList.add('table');
 
     const head = table.createTHead();
-    const headrow = head.insertRow();
 
-    const headcell0 = document.createElement('th');
-    headrow.appendChild(headcell0);
-
-    const headcell1 = document.createElement('th');
-    headcell1.innerText = 'Wounds'
-    headcell1.scope = 'col';
-    headrow.appendChild(headcell1);
+    const headrow1 = head.insertRow();
+    insertThCell(headrow1);
+    insertThCell(headrow1, 'Hit Rate');
+    insertThCell(headrow1, 'Wounds');
 
     const body = table.createTBody();
 
     const median = getMedian(wounds);
 
     const bodyrow1 = body.insertRow();
-    const row1cell0 = document.createElement('th');
-    row1cell0.innerText = 'Median';
-    row1cell0.scope = 'row';
-    bodyrow1.appendChild(row1cell0);
-    const row1cell1 = bodyrow1.insertCell();
-    row1cell1.innerText = String(median);
+    insertThCell(bodyrow1, 'Median');
+    insertCell(bodyrow1);
+    insertCell(bodyrow1, String(median));
 
-    const average = getAverage(wounds);
+    const averageHit = getAverage(hits) * 100;
+    const averageWounds = getAverage(wounds);
 
     const bodyrow2 = body.insertRow();
-    const row2cell0 = document.createElement('th');
-    row2cell0.innerText = 'Average';
-    row2cell0.scope = 'row';
-    bodyrow2.appendChild(row2cell0);
-    const row2cell1 = bodyrow2.insertCell();
-    row2cell1.innerText = String(average.toFixed(2));
+    insertThCell(bodyrow2, 'Average');
+    insertCell(bodyrow2, String(averageHit.toFixed(2)) + '%');
+    insertCell(bodyrow2, String(averageWounds.toFixed(2)));
 
     const stddev = getStandardDeviation(wounds);
 
     const bodyrow3 = body.insertRow();
-    const row3cell0 = document.createElement('th');
-    row3cell0.innerText = 'Standard deviation';
-    row3cell0.scope = 'row';
-    bodyrow3.appendChild(row3cell0);
-    const row3cell1 = bodyrow3.insertCell();
-    row3cell1.innerText = String(stddev.toFixed(2));
+    insertThCell(bodyrow3, 'Standard deviation');
+    insertCell(bodyrow3);
+    insertCell(bodyrow3, String(stddev.toFixed(2)));
 
     return table;
 }
@@ -453,6 +425,7 @@ btnCalcMelee!.addEventListener('click', () => {
         const inputTough = document.querySelector<HTMLInputElement>('#melee-tough');
         const tough = Number(inputTough!.value);
 
+        const hits: number[] = [];
         const wounds: number[] = [];
 
         for (let x = 0; x < SIM_COUNT; x++) {
@@ -492,6 +465,13 @@ btnCalcMelee!.addEventListener('click', () => {
                 const sl = defResult === -1 ? attResult + brutal : attResult + brutal - (defResult + parry);
                 const sucessLevels = getSucessLevels(sl, combo);
 
+                if (sucessLevels.length) {
+                    hits.push(1);
+                }
+                else {
+                    hits.push(0);
+                }
+
                 for (let i = 0; i < sucessLevels.length; i++) {
                     const dice1 = d6();
                     const dice2 = d6();
@@ -519,7 +499,7 @@ btnCalcMelee!.addEventListener('click', () => {
             wounds.push(wound);
         }
 
-        const table = renderMeleeTable(wounds);
+        const table = renderMeleeTable(hits, wounds);
 
         const container = document.getElementById('melee-result-container');
         while (container!.firstChild) {
