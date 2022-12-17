@@ -525,17 +525,32 @@ btnCalcMelee!.addEventListener('click', () => {
         if (defProwess) {
             text += ' | Prowess [Defence] (' + defProwess + ')';
         }
+        if (feint) {
+            text += ' | Feint (' + feint + ')';
+        }
         if (strong) {
             text += ' | Strong';
         }
         if (weak) {
             text += ' | Weak';
         }
+        if (attKata) {
+            text += ' | Kata (Attacker)';
+        }
         if (combo) {
             text += ' | Combo Attack';
         }
         if (tough) {
             text += ' | Tough (' + tough + ')';
+        }
+        if (parry) {
+            text += ' | Parry (' + parry + ')';
+        }
+        if (dodge) {
+            text += ' | Dodge (' + dodge + ')';
+        }
+        if (defKata) {
+            text += ' | Kata (Defender)';
         }
 
         const caption = table.createCaption();
