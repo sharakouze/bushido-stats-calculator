@@ -1,4 +1,4 @@
-import { Chart } from "./chart.js/dist/types";
+"use strict";
 function d6() {
     const min = 1;
     const max = 6;
@@ -231,6 +231,28 @@ function renderRangedChart(chart, result) {
     console.log(data1);
     console.log(data2);
     console.log(data3);
+    chart.data.datasets = [
+        {
+            type: 'line',
+            label: 'Short range',
+            data: data1,
+            spanGaps: true,
+        },
+        {
+            type: 'line',
+            label: 'Medium range',
+            data: data2,
+            spanGaps: true,
+        },
+        {
+            type: 'line',
+            label: 'Long range',
+            data: data3,
+            spanGaps: true,
+        }
+    ];
+    chart.data.labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    chart.update();
 }
 function renderMeleeTable(hits, wounds) {
     const table = document.createElement('table');
@@ -377,6 +399,12 @@ const chartRanged = new Chart(ctx1, {
                 title: {
                     display: true,
                     text: 'Minimum wounds'
+                }
+            },
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: (value) => value + '%'
                 }
             }
         }

@@ -260,7 +260,7 @@ function renderRangedTable(result: IRangedResult): void {
     container!.appendChild(table);
 }
 
-function renderRangedChart(chart: Chart, result: IRangedResult): void {
+function renderRangedChart(chart: typeof Chart, result: IRangedResult): void {
     /* count the occurence of wounds. Example : 
     wounds[0] = 45 -> 45 times 0 wound
     wounds[1] = undefined -> 0 time 1 wound
@@ -303,10 +303,33 @@ function renderRangedChart(chart: Chart, result: IRangedResult): void {
     console.log(data2);
     console.log(data3);
 
-    /*const max = chart.data!.datasets!.reduce((p, c) => Math.max(p, c.data!.length), 0);
-    const arr = new Array(max);
-    chart.data.labels = arr.fill(undefined).map((_, index) => index);
-    */
+    chart.data.datasets = [
+        {
+            type: 'line',
+            label: 'Short range',
+            data: data1,
+            spanGaps: true,
+        },
+        {
+            type: 'line',
+            label: 'Medium range',
+            data: data2,
+            spanGaps: true,
+        },
+        {
+            type: 'line',
+            label: 'Long range',
+            data: data3,
+            spanGaps: true,
+        }
+    ];
+
+    //const max = chart.data!.datasets!.reduce((p, c) => Math.max(p, c.data!.length), 0);
+    //const arr = new Array(max);
+    //chart.data.labels = arr.fill(undefined).map((_, index) => index);
+    
+    chart.data.labels = [0,1,2,3,4,5,6,7,8,9,10];
+    chart.update();
 }
 
 function renderMeleeTable(hits: boolean[], wounds: number[]): HTMLTableElement {
@@ -490,6 +513,12 @@ const chartRanged = new Chart(ctx1!, {
                 title: {
                     display: true,
                     text: 'Minimum wounds'
+                }
+            },
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: (value: string) => value + '%'
                 }
             }
         }
