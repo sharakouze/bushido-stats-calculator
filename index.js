@@ -1,4 +1,4 @@
-"use strict";
+import { Chart } from "./chart.js/dist/types";
 function d6() {
     const min = 1;
     const max = 6;
@@ -134,7 +134,7 @@ function insertCell(tr, text) {
         td.innerText = text;
     }
 }
-function renderRangedTable(shortRangeHits, mediumRangeHits, longRangeHits, shortRangeWounds, mediumRangeWounds, longRangeWounds) {
+function renderRangedTable(result) {
     const table = document.createElement('table');
     table.classList.add('table');
     const head = table.createTHead();
@@ -144,31 +144,93 @@ function renderRangedTable(shortRangeHits, mediumRangeHits, longRangeHits, short
     insertThCell(headrow1, 'Median wounds');
     insertThCell(headrow1, 'Average wounds');
     const body = table.createTBody();
-    const shortRangeHitRate = getAverage(shortRangeHits.map(x => x ? 100 : 0));
-    const shortRangeMedianW = getMedian(shortRangeWounds);
-    const shortRangeAvgW = getAverage(shortRangeWounds);
+    const shortRangeHitRate = getAverage(result.short.hits.map(x => x ? 100 : 0));
+    const shortRangeMedianW = getMedian(result.short.wounds);
+    const shortRangeAvgW = getAverage(result.short.wounds);
     const bodyrow1 = body.insertRow();
     insertThCell(bodyrow1, 'Short range');
     insertCell(bodyrow1, String(shortRangeHitRate.toFixed(1)) + '%');
     insertCell(bodyrow1, String(shortRangeMedianW));
     insertCell(bodyrow1, String(shortRangeAvgW.toFixed(2)));
-    const mediumRangeHitRate = getAverage(mediumRangeHits.map(x => x ? 100 : 0));
-    const mediumRangeMedianW = getMedian(mediumRangeWounds);
-    const mediumRangeAvgW = getAverage(mediumRangeWounds);
+    const mediumRangeHitRate = getAverage(result.medium.hits.map(x => x ? 100 : 0));
+    const mediumRangeMedianW = getMedian(result.medium.wounds);
+    const mediumRangeAvgW = getAverage(result.medium.wounds);
     const bodyrow2 = body.insertRow();
     insertThCell(bodyrow2, 'Medium range');
     insertCell(bodyrow2, String(mediumRangeHitRate.toFixed(1)) + '%');
     insertCell(bodyrow2, String(mediumRangeMedianW));
     insertCell(bodyrow2, String(mediumRangeAvgW.toFixed(2)));
-    const longRangeHitRate = getAverage(longRangeHits.map(x => x ? 100 : 0));
-    const longRangeMedianW = getMedian(longRangeWounds);
-    const longRangeAvgW = getAverage(longRangeWounds);
+    const longRangeHitRate = getAverage(result.long.hits.map(x => x ? 100 : 0));
+    const longRangeMedianW = getMedian(result.long.wounds);
+    const longRangeAvgW = getAverage(result.long.wounds);
     const bodyrow3 = body.insertRow();
     insertThCell(bodyrow3, 'Long range');
     insertCell(bodyrow3, String(longRangeHitRate.toFixed(1)) + '%');
     insertCell(bodyrow3, String(longRangeMedianW));
     insertCell(bodyrow3, String(longRangeAvgW.toFixed(2)));
-    return table;
+    let text = 'Pool ' + result.values.pool +
+        ' | Attack Challenge mod. ' + result.values.attModifier +
+        ' | Damage mod. ' + result.values.dmgModifier;
+    if (result.values.brutal) {
+        text += ' | Brutal (' + result.values.brutal + ')';
+    }
+    if (result.values.prowess) {
+        text += ' | Prowess (' + result.values.prowess + ')';
+    }
+    if (result.values.strong) {
+        text += ' | Strong';
+    }
+    if (result.values.weak) {
+        text += ' | Weak';
+    }
+    if (result.values.combo) {
+        text += ' | Combo Attack';
+    }
+    if (result.values.tough) {
+        text += ' | Tough (' + result.values.tough + ')';
+    }
+    const caption = table.createCaption();
+    caption.innerText = text;
+    const container = document.getElementById('ranged-result-container');
+    while (container.firstChild) {
+        container.firstChild.remove();
+    }
+    container.appendChild(table);
+}
+function renderRangedChart(chart, result) {
+    const wounds1 = result.short.wounds.reduce((p, c) => {
+        const d = p[c] || 0;
+        p[c] = d + 1;
+        return p;
+    }, []);
+    const wounds2 = result.medium.wounds.reduce((p, c) => {
+        const d = p[c] || 0;
+        p[c] = d + 1;
+        return p;
+    }, []);
+    const wounds3 = result.long.wounds.reduce((p, c) => {
+        const d = p[c] || 0;
+        p[c] = d + 1;
+        return p;
+    }, []);
+    const data1 = [];
+    const data2 = [];
+    const data3 = [];
+    for (let i = 0; i < wounds1.length; i++) {
+        const sum = wounds1.slice(i).reduce((p, c) => p + (c || 0), 0);
+        data1.push(sum * 100 / result.short.wounds.length);
+    }
+    for (let i = 0; i < wounds2.length; i++) {
+        const sum = wounds2.slice(i).reduce((p, c) => p + (c || 0), 0);
+        data2.push(sum * 100 / result.medium.wounds.length);
+    }
+    for (let i = 0; i < wounds3.length; i++) {
+        const sum = wounds3.slice(i).reduce((p, c) => p + (c || 0), 0);
+        data3.push(sum * 100 / result.long.wounds.length);
+    }
+    console.log(data1);
+    console.log(data2);
+    console.log(data3);
 }
 function renderMeleeTable(hits, wounds) {
     const table = document.createElement('table');
@@ -191,8 +253,7 @@ function renderMeleeTable(hits, wounds) {
     return table;
 }
 const SIM_COUNT = 100000;
-const btnCalcRanged = document.getElementById('ranged-calc');
-btnCalcRanged.addEventListener('click', () => {
+function calcRanged() {
     const form = document.querySelector('#form-ranged');
     const valid = form.reportValidity();
     if (valid) {
@@ -280,36 +341,57 @@ btnCalcRanged.addEventListener('click', () => {
             mediumRangeWounds.push(mediumRangeWound);
             longRangeWounds.push(longRangeWound);
         }
-        const table = renderRangedTable(shortRangeHits, mediumRangeHits, longRangeHits, shortRangeWounds, mediumRangeWounds, longRangeWounds);
-        let text = 'Pool ' + pool + ' | Attack Challenge mod. ' + attModifier + ' | Damage mod. ' + dmgModifier;
-        if (brutal) {
-            text += ' | Brutal (' + brutal + ')';
-        }
-        if (prowess) {
-            text += ' | Prowess (' + prowess + ')';
-        }
-        if (strong) {
-            text += ' | Strong';
-        }
-        if (weak) {
-            text += ' | Weak';
-        }
-        if (combo) {
-            text += ' | Combo Attack';
-        }
-        if (tough) {
-            text += ' | Tough (' + tough + ')';
-        }
-        const caption = table.createCaption();
-        caption.innerText = text;
-        const container = document.getElementById('ranged-result-container');
-        while (container.firstChild) {
-            container.firstChild.remove();
-        }
-        container.appendChild(table);
+        return {
+            values: {
+                pool,
+                attModifier,
+                dmgModifier,
+                brutal,
+                prowess,
+                strong,
+                weak,
+                combo,
+                tough,
+            },
+            short: {
+                hits: shortRangeHits,
+                wounds: shortRangeWounds,
+            },
+            medium: {
+                hits: mediumRangeHits,
+                wounds: mediumRangeWounds,
+            },
+            long: {
+                hits: longRangeHits,
+                wounds: longRangeWounds,
+            }
+        };
     }
+}
+const canvas1 = document.querySelector('#ranged-chart-container');
+const ctx1 = canvas1.getContext('2d');
+const chartRanged = new Chart(ctx1, {
+    options: {
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Minimum wounds'
+                }
+            }
+        }
+    },
+    data: {
+        datasets: []
+    },
 });
-const btnCalcMelee = document.getElementById('melee-calc');
+const btnCalcRanged = document.getElementById('btn-ranged-calc');
+btnCalcRanged.addEventListener('click', () => {
+    const result = calcRanged();
+    renderRangedTable(result);
+    renderRangedChart(chartRanged, result);
+});
+const btnCalcMelee = document.getElementById('btn-melee-calc');
 btnCalcMelee.addEventListener('click', () => {
     const form = document.querySelector('#form-melee');
     const valid = form.reportValidity();

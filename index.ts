@@ -56,6 +56,7 @@ function rerollDodgeFeint(dices: number[], count: number): void {
 
 function getTestResult(dices: number[], kata: boolean): number {
     if (!kata) {
+        // remove 1's from the pool
         let i = 0;
         while (i < dices.length) {
             if (dices[i] === 1) {
@@ -81,7 +82,7 @@ function getTestResult(dices: number[], kata: boolean): number {
     return max + dices.length - 1;
 }
 
-function getSucessLevels(sl: number, combo: boolean) {
+function getSucessLevels(sl: number, combo: boolean): number[] {
     const levels: number[] = [];
     if (combo) {
         if (sl === 0 || sl === 1) {
@@ -101,7 +102,7 @@ function getSucessLevels(sl: number, combo: boolean) {
     return levels;
 }
 
-function getWounds(dmgRollMod: number, sl: number, tough: number) {
+function getWounds(dmgRollMod: number, sl: number, tough: number): number {
     if (dmgRollMod < 2) {
         dmgRollMod = 2;
     }
@@ -143,22 +144,47 @@ function getStandardDeviation(arr: number[]): number {
     return Math.sqrt(arr.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
 }
 
-function insertThCell(tr: HTMLTableRowElement, text?: string) {
+function insertThCell(tr: HTMLTableRowElement, text?: string): void {
     const th = document.createElement('th');
     if (text) {
         th.innerText = text;
     }
     tr.appendChild(th);
 }
-function insertCell(tr: HTMLTableRowElement, text?: string) {
+function insertCell(tr: HTMLTableRowElement, text?: string): void {
     const td = tr.insertCell();
     if (text) {
         td.innerText = text;
     }
 }
 
-function renderRangedTable(shortRangeHits: boolean[], mediumRangeHits: boolean[], longRangeHits: boolean[],
-    shortRangeWounds: number[], mediumRangeWounds: number[], longRangeWounds: number[]): HTMLTableElement {
+interface IRangedResult {
+    values: {
+        pool: number,
+        attModifier: number,
+        dmgModifier: number,
+        brutal: number,
+        prowess: number,
+        strong: boolean,
+        weak: boolean,
+        combo: boolean,
+        tough: number,
+    },
+    short: {
+        hits: boolean[],
+        wounds: number[],
+    },
+    medium: {
+        hits: boolean[],
+        wounds: number[],
+    },
+    long: {
+        hits: boolean[],
+        wounds: number[],
+    },
+}
+
+function renderRangedTable(result: IRangedResult): void {
     const table = document.createElement('table');
     table.classList.add('table');
 
@@ -172,9 +198,9 @@ function renderRangedTable(shortRangeHits: boolean[], mediumRangeHits: boolean[]
 
     const body = table.createTBody();
 
-    const shortRangeHitRate = getAverage(shortRangeHits.map(x => x ? 100 : 0));
-    const shortRangeMedianW = getMedian(shortRangeWounds);
-    const shortRangeAvgW = getAverage(shortRangeWounds);
+    const shortRangeHitRate = getAverage(result.short.hits.map(x => x ? 100 : 0));
+    const shortRangeMedianW = getMedian(result.short.wounds);
+    const shortRangeAvgW = getAverage(result.short.wounds);
 
     const bodyrow1 = body.insertRow();
     insertThCell(bodyrow1, 'Short range');
@@ -182,9 +208,9 @@ function renderRangedTable(shortRangeHits: boolean[], mediumRangeHits: boolean[]
     insertCell(bodyrow1, String(shortRangeMedianW));
     insertCell(bodyrow1, String(shortRangeAvgW.toFixed(2)));
 
-    const mediumRangeHitRate = getAverage(mediumRangeHits.map(x => x ? 100 : 0));
-    const mediumRangeMedianW = getMedian(mediumRangeWounds);
-    const mediumRangeAvgW = getAverage(mediumRangeWounds);
+    const mediumRangeHitRate = getAverage(result.medium.hits.map(x => x ? 100 : 0));
+    const mediumRangeMedianW = getMedian(result.medium.wounds);
+    const mediumRangeAvgW = getAverage(result.medium.wounds);
 
     const bodyrow2 = body.insertRow();
     insertThCell(bodyrow2, 'Medium range');
@@ -192,9 +218,9 @@ function renderRangedTable(shortRangeHits: boolean[], mediumRangeHits: boolean[]
     insertCell(bodyrow2, String(mediumRangeMedianW));
     insertCell(bodyrow2, String(mediumRangeAvgW.toFixed(2)));
 
-    const longRangeHitRate = getAverage(longRangeHits.map(x => x ? 100 : 0));
-    const longRangeMedianW = getMedian(longRangeWounds);
-    const longRangeAvgW = getAverage(longRangeWounds);
+    const longRangeHitRate = getAverage(result.long.hits.map(x => x ? 100 : 0));
+    const longRangeMedianW = getMedian(result.long.wounds);
+    const longRangeAvgW = getAverage(result.long.wounds);
 
     const bodyrow3 = body.insertRow();
     insertThCell(bodyrow3, 'Long range');
@@ -202,7 +228,85 @@ function renderRangedTable(shortRangeHits: boolean[], mediumRangeHits: boolean[]
     insertCell(bodyrow3, String(longRangeMedianW));
     insertCell(bodyrow3, String(longRangeAvgW.toFixed(2)));
 
-    return table;
+    let text = 'Pool ' + result.values.pool +
+        ' | Attack Challenge mod. ' + result.values.attModifier +
+        ' | Damage mod. ' + result.values.dmgModifier;
+    if (result.values.brutal) {
+        text += ' | Brutal (' + result.values.brutal + ')';
+    }
+    if (result.values.prowess) {
+        text += ' | Prowess (' + result.values.prowess + ')';
+    }
+    if (result.values.strong) {
+        text += ' | Strong';
+    }
+    if (result.values.weak) {
+        text += ' | Weak';
+    }
+    if (result.values.combo) {
+        text += ' | Combo Attack';
+    }
+    if (result.values.tough) {
+        text += ' | Tough (' + result.values.tough + ')';
+    }
+
+    const caption = table.createCaption();
+    caption.innerText = text;
+
+    const container = document.getElementById('ranged-result-container');
+    while (container!.firstChild) {
+        container!.firstChild.remove();
+    }
+    container!.appendChild(table);
+}
+
+function renderRangedChart(chart: Chart, result: IRangedResult): void {
+    /* count the occurence of wounds. Example : 
+    wounds[0] = 45 -> 45 times 0 wound
+    wounds[1] = undefined -> 0 time 1 wound
+    wounds[2] = 33 -> 33 times 2 wounds
+    etc... */
+    const wounds1 = result.short.wounds.reduce<number[]>((p, c) => {
+        const d = p[c] || 0;
+        p[c] = d + 1;
+        return p;
+    }, []);
+    const wounds2 = result.medium.wounds.reduce<number[]>((p, c) => {
+        const d = p[c] || 0;
+        p[c] = d + 1;
+        return p;
+    }, []);
+    const wounds3 = result.long.wounds.reduce<number[]>((p, c) => {
+        const d = p[c] || 0;
+        p[c] = d + 1;
+        return p;
+    }, []);
+
+    const data1: (number | null)[] = [];
+    const data2: (number | null)[] = [];
+    const data3: (number | null)[] = [];
+
+    for (let i = 0; i < wounds1.length; i++) {
+        const sum = wounds1.slice(i).reduce((p, c) => p + (c || 0), 0);
+        data1.push(sum * 100 / result.short.wounds.length);
+    }
+    for (let i = 0; i < wounds2.length; i++) {
+        const sum = wounds2.slice(i).reduce((p, c) => p + (c || 0), 0);
+        data2.push(sum * 100 / result.medium.wounds.length);
+    }
+    for (let i = 0; i < wounds3.length; i++) {
+        const sum = wounds3.slice(i).reduce((p, c) => p + (c || 0), 0);
+        data3.push(sum * 100 / result.long.wounds.length);
+    }
+
+    console.log(data1);
+    console.log(data2);
+    console.log(data3);
+
+    /*const max = chart.data!.datasets!.reduce((p, c) => Math.max(p, c.data!.length), 0);
+    const arr = new Array(max);
+    chart.data.labels = arr.fill(undefined).map((_, index) => index);
+    */
 }
 
 function renderMeleeTable(hits: boolean[], wounds: number[]): HTMLTableElement {
@@ -234,8 +338,7 @@ function renderMeleeTable(hits: boolean[], wounds: number[]): HTMLTableElement {
 
 const SIM_COUNT = 100000;
 
-const btnCalcRanged = document.getElementById('ranged-calc');
-btnCalcRanged!.addEventListener('click', () => {
+function calcRanged(): IRangedResult | undefined {
     const form = document.querySelector<HTMLFormElement>('#form-ranged');
     const valid = form!.reportValidity();
     if (valid) {
@@ -350,40 +453,60 @@ btnCalcRanged!.addEventListener('click', () => {
             longRangeWounds.push(longRangeWound);
         }
 
-        const table = renderRangedTable(shortRangeHits, mediumRangeHits, longRangeHits, shortRangeWounds, mediumRangeWounds, longRangeWounds);
-
-        let text = 'Pool ' + pool + ' | Attack Challenge mod. ' + attModifier + ' | Damage mod. ' + dmgModifier;
-        if (brutal) {
-            text += ' | Brutal (' + brutal + ')';
-        }
-        if (prowess) {
-            text += ' | Prowess (' + prowess + ')';
-        }
-        if (strong) {
-            text += ' | Strong';
-        }
-        if (weak) {
-            text += ' | Weak';
-        }
-        if (combo) {
-            text += ' | Combo Attack';
-        }
-        if (tough) {
-            text += ' | Tough (' + tough + ')';
-        }
-
-        const caption = table.createCaption();
-        caption.innerText = text;
-
-        const container = document.getElementById('ranged-result-container');
-        while (container!.firstChild) {
-            container!.firstChild.remove();
-        }
-        container!.appendChild(table);
+        return {
+            values: {
+                pool,
+                attModifier,
+                dmgModifier,
+                brutal,
+                prowess,
+                strong,
+                weak,
+                combo,
+                tough,
+            },
+            short: {
+                hits: shortRangeHits,
+                wounds: shortRangeWounds,
+            },
+            medium: {
+                hits: mediumRangeHits,
+                wounds: mediumRangeWounds,
+            },
+            long: {
+                hits: longRangeHits,
+                wounds: longRangeWounds,
+            }
+        };
     }
+}
+
+const canvas1 = document.querySelector<HTMLCanvasElement>('#ranged-chart-container');
+const ctx1 = canvas1!.getContext('2d');
+const chartRanged = new Chart(ctx1!, {
+    options: {
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Minimum wounds'
+                }
+            }
+        }
+    },
+    data: {
+        datasets: []
+    },
 });
 
-const btnCalcMelee = document.getElementById('melee-calc');
+const btnCalcRanged = document.getElementById('btn-ranged-calc');
+btnCalcRanged!.addEventListener('click', () => {
+    const result = calcRanged();
+    renderRangedTable(result!);
+    renderRangedChart(chartRanged, result!);
+});
+
+const btnCalcMelee = document.getElementById('btn-melee-calc');
 btnCalcMelee!.addEventListener('click', () => {
     const form = document.querySelector<HTMLFormElement>('#form-melee');
     const valid = form!.reportValidity();
