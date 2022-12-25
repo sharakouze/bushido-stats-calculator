@@ -424,7 +424,38 @@ function renderMeleeTable(result: IMeleeResult): void {
 }
 
 function renderMeleeChart(chart: Chart, result: IMeleeResult): void {
+    /* count the number of occurence of wounds. Example : 
+    wounds[0] = 45 -> 45 times 0 wound
+    wounds[1] = undefined -> 0 time 1 wound
+    wounds[2] = 33 -> 33 times 2 wounds
+    etc... */
+    const wounds1 = result.wounds.reduce<number[]>((p, c) => {
+        const d = p[c] || 0;
+        p[c] = d + 1;
+        return p;
+    }, []);
 
+    const data1: (number | null)[] = [];
+
+    for (let i = 0; i < wounds1.length; i++) {
+        const sum = wounds1.slice(i).reduce((p, c) => p + (c || 0), 0);
+        data1.push(sum * 100 / result.wounds.length);
+    }
+
+    chart.data.datasets = [
+        {
+            type: 'line',
+            label: 'Attacker',
+            data: data1,
+            spanGaps: true,
+        }
+    ];
+
+    const max = chart.data.datasets.reduce((p, c) => Math.max(p, c.data.length), 0);
+    const arr = new Array(max);
+    chart.data.labels = arr.fill(undefined).map((_, index) => index);
+
+    chart.update();
 }
 
 const SIM_COUNT = 100000;
@@ -744,7 +775,14 @@ const chartConfig = {
         plugins: {
             tooltip: {
                 callbacks: {
-                    title: (items: any) => 'Minimum wounds : ' + items[0].label
+                    title: (items: any) => {
+                        const w = Number(items[0].label);
+                        if (w > 1) {
+                            return 'Probability of inflicting at least ' + w + ' wounds'
+                        }
+                        return 'Probability of inflicting at least ' + w + ' wound'
+                    },
+                    label: (item: any) => item.dataset.label + ' : ' + Number(item.raw).toFixed(1) + '%'
                 }
             }
         }

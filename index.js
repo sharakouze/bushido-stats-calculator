@@ -319,6 +319,28 @@ function renderMeleeTable(result) {
     container.appendChild(table);
 }
 function renderMeleeChart(chart, result) {
+    const wounds1 = result.wounds.reduce((p, c) => {
+        const d = p[c] || 0;
+        p[c] = d + 1;
+        return p;
+    }, []);
+    const data1 = [];
+    for (let i = 0; i < wounds1.length; i++) {
+        const sum = wounds1.slice(i).reduce((p, c) => p + (c || 0), 0);
+        data1.push(sum * 100 / result.wounds.length);
+    }
+    chart.data.datasets = [
+        {
+            type: 'line',
+            label: 'Attacker',
+            data: data1,
+            spanGaps: true,
+        }
+    ];
+    const max = chart.data.datasets.reduce((p, c) => Math.max(p, c.data.length), 0);
+    const arr = new Array(max);
+    chart.data.labels = arr.fill(undefined).map((_, index) => index);
+    chart.update();
 }
 const SIM_COUNT = 100000;
 function calcRanged() {
@@ -576,7 +598,14 @@ const chartConfig = {
         plugins: {
             tooltip: {
                 callbacks: {
-                    title: (items) => 'Minimum wounds : ' + items[0].label
+                    title: (items) => {
+                        const w = Number(items[0].label);
+                        if (w > 1) {
+                            return 'Probability of inflicting at least ' + w + ' wounds';
+                        }
+                        return 'Probability of inflicting at least ' + w + ' wound';
+                    },
+                    label: (item) => item.dataset.label + ' : ' + Number(item.raw).toFixed(1) + '%'
                 }
             }
         }
@@ -595,13 +624,13 @@ const btnCalcRanged = document.getElementById('btn-ranged-calc');
 btnCalcRanged.addEventListener('click', () => {
     const result = calcRanged();
     renderRangedTable(result);
-    renderRangedChart(chartRanged, result);
     canvas1.classList.remove('d-none');
+    renderRangedChart(chartRanged, result);
 });
 const btnCalcMelee = document.getElementById('btn-melee-calc');
 btnCalcMelee.addEventListener('click', () => {
     const result = calcMelee();
     renderMeleeTable(result);
-    renderMeleeChart(chartMelee, result);
     canvas2.classList.remove('d-none');
+    renderMeleeChart(chartMelee, result);
 });
