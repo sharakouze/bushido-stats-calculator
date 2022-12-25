@@ -38,6 +38,16 @@ function rerollDodgeFeint(dices, count) {
             rerolls.push(i);
         }
     }
+    if (rerolls.length < count) {
+        const n = dices.reduce((p, c) => c === 5 ? p + 1 : p, 0);
+        if (rerolls.length + n <= count) {
+            for (let i = 0; i < dices.length; i++) {
+                if (dices[i] === 5 && rerolls.length < count) {
+                    rerolls.push(i);
+                }
+            }
+        }
+    }
     for (const index of rerolls) {
         const dice = d6();
         dices[index] = dice;
@@ -149,7 +159,7 @@ function renderRangedTable(result) {
     const shortRangeAvgW = getAverage(result.short.wounds);
     const bodyrow1 = body.insertRow();
     insertThCell(bodyrow1, 'Short range');
-    insertCell(bodyrow1, String(shortRangeHitRate.toFixed(1)) + '%');
+    insertCell(bodyrow1, String(shortRangeHitRate.toFixed(2)) + '%');
     insertCell(bodyrow1, String(shortRangeMedianW));
     insertCell(bodyrow1, String(shortRangeAvgW.toFixed(2)));
     const mediumRangeHitRate = getAverage(result.medium.hits.map(x => x ? 100 : 0));
@@ -157,7 +167,7 @@ function renderRangedTable(result) {
     const mediumRangeAvgW = getAverage(result.medium.wounds);
     const bodyrow2 = body.insertRow();
     insertThCell(bodyrow2, 'Medium range');
-    insertCell(bodyrow2, String(mediumRangeHitRate.toFixed(1)) + '%');
+    insertCell(bodyrow2, String(mediumRangeHitRate.toFixed(2)) + '%');
     insertCell(bodyrow2, String(mediumRangeMedianW));
     insertCell(bodyrow2, String(mediumRangeAvgW.toFixed(2)));
     const longRangeHitRate = getAverage(result.long.hits.map(x => x ? 100 : 0));
@@ -165,7 +175,7 @@ function renderRangedTable(result) {
     const longRangeAvgW = getAverage(result.long.wounds);
     const bodyrow3 = body.insertRow();
     insertThCell(bodyrow3, 'Long range');
-    insertCell(bodyrow3, String(longRangeHitRate.toFixed(1)) + '%');
+    insertCell(bodyrow3, String(longRangeHitRate.toFixed(2)) + '%');
     insertCell(bodyrow3, String(longRangeMedianW));
     insertCell(bodyrow3, String(longRangeAvgW.toFixed(2)));
     let text = 'Pool ' + result.values.pool
@@ -268,7 +278,7 @@ function renderMeleeTable(result) {
     const averageWounds = getAverage(result.wounds);
     const bodyrow1 = body.insertRow();
     insertThCell(bodyrow1, 'Melee');
-    insertCell(bodyrow1, String(hitRate.toFixed(1)) + '%');
+    insertCell(bodyrow1, String(hitRate.toFixed(2)) + '%');
     insertCell(bodyrow1, String(medianWounds));
     insertCell(bodyrow1, String(averageWounds.toFixed(2)));
     let text = 'Att. Pool ' + result.values.attPool
@@ -605,7 +615,7 @@ const chartConfig = {
                         }
                         return 'Probability of inflicting at least ' + w + ' wound';
                     },
-                    label: (item) => item.dataset.label + ' : ' + Number(item.raw).toFixed(1) + '%'
+                    label: (item) => item.dataset.label + ' : ' + Number(item.raw).toFixed(2) + '%'
                 }
             }
         }
