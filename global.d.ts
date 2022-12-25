@@ -1,7 +1,11 @@
-import * as Chart from "chart.js";
+import { ChartConfiguration, ChartConfigurationCustomTypesPerDataset, ChartData, ChartItem } from "./lib/chart.js/dist/types/index";
 
 declare global {
-  const Chart: Chart
-}
-export { };
+  declare class Chart {
+    data: ChartData;
 
+    constructor(item: ChartItem, config: ChartConfiguration<TType, TData, TLabel> | ChartConfigurationCustomTypesPerDataset<TType, TData, TLabel>);
+
+    update(): void;
+  }
+}

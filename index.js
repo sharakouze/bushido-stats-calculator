@@ -168,9 +168,9 @@ function renderRangedTable(result) {
     insertCell(bodyrow3, String(longRangeHitRate.toFixed(1)) + '%');
     insertCell(bodyrow3, String(longRangeMedianW));
     insertCell(bodyrow3, String(longRangeAvgW.toFixed(2)));
-    let text = 'Pool ' + result.values.pool +
-        ' | Attack Challenge mod. ' + result.values.attModifier +
-        ' | Damage mod. ' + result.values.dmgModifier;
+    let text = 'Pool ' + result.values.pool
+        + ' | Attack Challenge mod. ' + result.values.attModifier
+        + ' | Damage mod. ' + result.values.dmgModifier;
     if (result.values.brutal) {
         text += ' | Brutal (' + result.values.brutal + ')';
     }
@@ -228,9 +228,6 @@ function renderRangedChart(chart, result) {
         const sum = wounds3.slice(i).reduce((p, c) => p + (c || 0), 0);
         data3.push(sum * 100 / result.long.wounds.length);
     }
-    console.log(data1);
-    console.log(data2);
-    console.log(data3);
     chart.data.datasets = [
         {
             type: 'line',
@@ -251,10 +248,12 @@ function renderRangedChart(chart, result) {
             spanGaps: true,
         }
     ];
-    chart.data.labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const max = chart.data.datasets.reduce((p, c) => Math.max(p, c.data.length), 0);
+    const arr = new Array(max);
+    chart.data.labels = arr.fill(undefined).map((_, index) => index);
     chart.update();
 }
-function renderMeleeTable(hits, wounds) {
+function renderMeleeTable(result) {
     const table = document.createElement('table');
     table.classList.add('table');
     const head = table.createTHead();
@@ -264,15 +263,62 @@ function renderMeleeTable(hits, wounds) {
     insertThCell(headrow1, 'Median wounds');
     insertThCell(headrow1, 'Average wounds');
     const body = table.createTBody();
-    const hitRate = getAverage(hits.map(x => x ? 100 : 0));
-    const medianWounds = getMedian(wounds);
-    const averageWounds = getAverage(wounds);
+    const hitRate = getAverage(result.hits.map(x => x ? 100 : 0));
+    const medianWounds = getMedian(result.wounds);
+    const averageWounds = getAverage(result.wounds);
     const bodyrow1 = body.insertRow();
     insertThCell(bodyrow1, 'Melee');
     insertCell(bodyrow1, String(hitRate.toFixed(1)) + '%');
     insertCell(bodyrow1, String(medianWounds));
     insertCell(bodyrow1, String(averageWounds.toFixed(2)));
-    return table;
+    let text = 'Att. Pool ' + result.values.attPool
+        + ' | Def. Pool ' + result.values.defPool
+        + ' | Damage mod. ' + result.values.dmgModifier;
+    if (result.values.brutal) {
+        text += ' | Brutal (' + result.values.brutal + ')';
+    }
+    if (result.values.attProwess) {
+        text += ' | Prowess [Attack] (' + result.values.attProwess + ')';
+    }
+    if (result.values.defProwess) {
+        text += ' | Prowess [Defence] (' + result.values.defProwess + ')';
+    }
+    if (result.values.feint) {
+        text += ' | Feint (' + result.values.feint + ')';
+    }
+    if (result.values.strong) {
+        text += ' | Strong';
+    }
+    if (result.values.weak) {
+        text += ' | Weak';
+    }
+    if (result.values.attKata) {
+        text += ' | Kata (Attacker)';
+    }
+    if (result.values.combo) {
+        text += ' | Combo Attack';
+    }
+    if (result.values.tough) {
+        text += ' | Tough (' + result.values.tough + ')';
+    }
+    if (result.values.parry) {
+        text += ' | Parry (' + result.values.parry + ')';
+    }
+    if (result.values.dodge) {
+        text += ' | Dodge (' + result.values.dodge + ')';
+    }
+    if (result.values.defKata) {
+        text += ' | Kata (Defender)';
+    }
+    const caption = table.createCaption();
+    caption.innerText = text;
+    const container = document.getElementById('melee-result-container');
+    while (container.firstChild) {
+        container.firstChild.remove();
+    }
+    container.appendChild(table);
+}
+function renderMeleeChart(chart, result) {
 }
 const SIM_COUNT = 100000;
 function calcRanged() {
@@ -390,37 +436,7 @@ function calcRanged() {
         };
     }
 }
-const canvas1 = document.querySelector('#ranged-chart-container');
-const ctx1 = canvas1.getContext('2d');
-const chartRanged = new Chart(ctx1, {
-    options: {
-        scales: {
-            x: {
-                title: {
-                    display: true,
-                    text: 'Minimum wounds'
-                }
-            },
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: (value) => value + '%'
-                }
-            }
-        }
-    },
-    data: {
-        datasets: []
-    },
-});
-const btnCalcRanged = document.getElementById('btn-ranged-calc');
-btnCalcRanged.addEventListener('click', () => {
-    const result = calcRanged();
-    renderRangedTable(result);
-    renderRangedChart(chartRanged, result);
-});
-const btnCalcMelee = document.getElementById('btn-melee-calc');
-btnCalcMelee.addEventListener('click', () => {
+function calcMelee() {
     const form = document.querySelector('#form-melee');
     const valid = form.reportValidity();
     if (valid) {
@@ -518,50 +534,74 @@ btnCalcMelee.addEventListener('click', () => {
             hits.push(hit);
             wounds.push(wound);
         }
-        const table = renderMeleeTable(hits, wounds);
-        let text = 'Att. Pool ' + attPool + ' | Def. Pool ' + defPool + ' | Damage mod. ' + dmgModifier;
-        if (brutal) {
-            text += ' | Brutal (' + brutal + ')';
-        }
-        if (attProwess) {
-            text += ' | Prowess [Attack] (' + attProwess + ')';
-        }
-        if (defProwess) {
-            text += ' | Prowess [Defence] (' + defProwess + ')';
-        }
-        if (feint) {
-            text += ' | Feint (' + feint + ')';
-        }
-        if (strong) {
-            text += ' | Strong';
-        }
-        if (weak) {
-            text += ' | Weak';
-        }
-        if (attKata) {
-            text += ' | Kata (Attacker)';
-        }
-        if (combo) {
-            text += ' | Combo Attack';
-        }
-        if (tough) {
-            text += ' | Tough (' + tough + ')';
-        }
-        if (parry) {
-            text += ' | Parry (' + parry + ')';
-        }
-        if (dodge) {
-            text += ' | Dodge (' + dodge + ')';
-        }
-        if (defKata) {
-            text += ' | Kata (Defender)';
-        }
-        const caption = table.createCaption();
-        caption.innerText = text;
-        const container = document.getElementById('melee-result-container');
-        while (container.firstChild) {
-            container.firstChild.remove();
-        }
-        container.appendChild(table);
+        return {
+            values: {
+                attPool,
+                defPool,
+                dmgModifier,
+                brutal,
+                attProwess,
+                defProwess,
+                feint,
+                strong,
+                weak,
+                attKata,
+                combo,
+                tough,
+                parry,
+                dodge,
+                defKata,
+            },
+            hits,
+            wounds
+        };
     }
+}
+const chartConfig = {
+    options: {
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Minimum wounds probability'
+                }
+            },
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: (value) => value + '%'
+                }
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: (items) => 'Minimum wounds : ' + items[0].label
+                }
+            }
+        }
+    },
+    data: {
+        datasets: []
+    },
+};
+const canvas1 = document.querySelector('#ranged-chart-container');
+const ctx1 = canvas1.getContext('2d');
+const chartRanged = new Chart(ctx1, chartConfig);
+const canvas2 = document.querySelector('#melee-chart-container');
+const ctx2 = canvas2.getContext('2d');
+const chartMelee = new Chart(ctx2, chartConfig);
+const btnCalcRanged = document.getElementById('btn-ranged-calc');
+btnCalcRanged.addEventListener('click', () => {
+    const result = calcRanged();
+    renderRangedTable(result);
+    renderRangedChart(chartRanged, result);
+    canvas1.classList.remove('d-none');
+});
+const btnCalcMelee = document.getElementById('btn-melee-calc');
+btnCalcMelee.addEventListener('click', () => {
+    const result = calcMelee();
+    renderMeleeTable(result);
+    renderMeleeChart(chartMelee, result);
+    canvas2.classList.remove('d-none');
 });
