@@ -103,22 +103,29 @@
             </div>
         </div>
         <div class="card mt-3">
-            <h5 class="card-header">Melee Attack</h5>
+            <h5 class="card-header">Melee Exchange</h5>
             <div class="card-body">
                 <form id="form-melee">
-                    <h6 class="card-subtitle mb-2 text-muted">Attacker (active player)</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Active player</h6>
                     <div class="row gx-3">
-                        <div class="col-12 col-sm-6">
+                        <div class="col-6 col-md-4">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control" id="melee-att-pool" placeholder="Attack Pool"
-                                    required min="1">
+                                <input type="number" class="form-control" id="melee-active-att-pool"
+                                    placeholder="Attack Pool" required min="0">
                                 <label class="text-primary">Attack Pool</label>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6">
+                        <div class="col-6 col-md-4">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-active-def-pool"
+                                    placeholder="Defence Pool" required min="0">
+                                <label class="text-primary">Defence Pool</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
                             <div class="input-group mb-3">
                                 <div class="form-floating">
-                                    <input type="number" class="form-control" id="melee-dmg-modifier"
+                                    <input type="number" class="form-control" id="melee-active-dmg-modifier"
                                         placeholder="Damage Modifier">
                                     <label>Damage Modifier</label>
                                 </div>
@@ -128,29 +135,30 @@
                         </div>
                     </div>
                     <div class="row gx-3">
-                        <div class="col-6 col-md-4 col-lg-2">
+                        <div class="col-6 col-md-3">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control" id="melee-brutal" placeholder="Brutal"
+                                <input type="number" class="form-control" id="melee-active-att-prowess"
+                                    placeholder="Prowess [Attack]" min="0">
+                                <label>Prowess [Attack]</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-active-brutal" placeholder="Brutal"
                                     min="0">
                                 <label>Brutal</label>
                             </div>
                         </div>
-                        <div class="col-6 col-md-4 col-lg-2">
+                        <div class="col-6 col-md-3">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control" id="melee-att-prowess" placeholder="Prowess"
+                                <input type="number" class="form-control" id="melee-active-feint" placeholder="Feint"
                                     min="0">
-                                <label>Prowess</label>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-4 col-lg-2">
-                            <div class="form-floating mb-3">
-                                <input type="number" class="form-control" id="melee-feint" placeholder="Feint" min="0">
                                 <label>Feint</label>
                             </div>
                         </div>
-                        <div class="col-6 col-md-4 col-lg-2">
+                        <div class="col-6 col-md-3">
                             <div class="form-floating mb-3">
-                                <select class="form-control" id="melee-strong-weak">
+                                <select class="form-control" id="melee-active-strong-weak">
                                     <option value="0">None</option>
                                     <option value="1">Strong</option>
                                     <option value="2">Weak</option>
@@ -158,32 +166,27 @@
                                 <label>Strong or Weak</label>
                             </div>
                         </div>
-                        <div class="col-6 col-md-4 col-lg-2">
-                            <div class="form-floating mb-3">
-                                <select class="form-control" id="melee-att-kata">
-                                    <option value="0">No</option>
-                                    <option value="1">Yes</option>
-                                </select>
-                                <label>Kata</label>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-4 col-lg-2">
-                            <div class="form-floating mb-3">
-                                <select class="form-control" id="melee-combo">
-                                    <option value="0">No</option>
-                                    <option value="1">Yes</option>
-                                </select>
-                                <label>Combo Attack</label>
-                            </div>
-                        </div>
                     </div>
-                    <h6 class="card-subtitle mb-2 text-muted">Defender</h6>
                     <div class="row gx-3">
-                        <div class="col-6">
+                        <div class="col-6 col-md-3">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control" id="melee-def-pool"
-                                    placeholder="Defence Pool">
-                                <label class="text-primary">Defence Pool</label>
+                                <input type="number" class="form-control" id="melee-active-def-prowess"
+                                    placeholder="Prowess [Defence]" min="0">
+                                <label>Prowess [Defence]</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-active-parry" placeholder="Parry"
+                                    min="0">
+                                <label>Parry</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="melee-active-dodge" placeholder="Dodge"
+                                    min="0">
+                                <label>Dodge</label>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
@@ -196,23 +199,34 @@
                     <div class="row gx-3">
                         <div class="col-6 col-md-3">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control" id="melee-parry" placeholder="Parry" min="0">
-                                <label>Parry</label>
+                                <select class="form-control" id="melee-active-kata">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <label>Kata</label>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control" id="melee-def-prowess" placeholder="Prowess"
-                                    min="0">
-                                <label>Prowess</label>
+                                <select class="form-control" id="melee-active-combo">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <label>Combo Attack</label>
                             </div>
                         </div>
-                        <div class="col-6 col-md-3">
+                    </div>
+                    <h6 class="card-subtitle mb-2 text-muted">Non active player</h6>
+                    <div class="row gx-3">
+                        <div class="col-6">
                             <div class="form-floating mb-3">
-                                <input type="number" class="form-control" id="melee-dodge" placeholder="Dodge" min="0">
-                                <label>Dodge</label>
+                                <input type="number" class="form-control" id="melee-def-pool"
+                                    placeholder="Defence Pool">
+                                <label class="text-primary">Defence Pool</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row gx-3">
                         <div class="col-6 col-md-3">
                             <div class="form-floating mb-3">
                                 <select class="form-control" id="melee-def-kata">
