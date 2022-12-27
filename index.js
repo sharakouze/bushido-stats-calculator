@@ -273,55 +273,110 @@ function renderMeleeTable(result) {
     insertThCell(headrow1, 'Median wounds');
     insertThCell(headrow1, 'Average wounds');
     const body = table.createTBody();
-    const hitRate = getAverage(result.hits.map(x => x ? 100 : 0));
-    const medianWounds = getMedian(result.wounds);
-    const averageWounds = getAverage(result.wounds);
+    const p1HitRate = getAverage(result.player1.hits.map(x => x ? 100 : 0));
+    const p1MedianWounds = getMedian(result.player1.wounds);
+    const p1AverageWounds = getAverage(result.player1.wounds);
     const bodyrow1 = body.insertRow();
-    insertThCell(bodyrow1, 'Melee');
-    insertCell(bodyrow1, String(hitRate.toFixed(2)) + '%');
-    insertCell(bodyrow1, String(medianWounds));
-    insertCell(bodyrow1, String(averageWounds.toFixed(2)));
-    let text = 'Att. Pool ' + result.values.attPool
-        + ' | Def. Pool ' + result.values.defPool
-        + ' | Damage mod. ' + result.values.dmgModifier;
-    if (result.values.brutal) {
-        text += ' | Brutal (' + result.values.brutal + ')';
+    insertThCell(bodyrow1, 'Active player');
+    insertCell(bodyrow1, String(p1HitRate.toFixed(2)) + '%');
+    insertCell(bodyrow1, String(p1MedianWounds));
+    insertCell(bodyrow1, String(p1AverageWounds.toFixed(2)));
+    const p2HitRate = getAverage(result.player2.hits.map(x => x ? 100 : 0));
+    const p2MedianWounds = getMedian(result.player2.wounds);
+    const p2AverageWounds = getAverage(result.player2.wounds);
+    const bodyrow2 = body.insertRow();
+    insertThCell(bodyrow2, 'Non active player');
+    insertCell(bodyrow2, String(p2HitRate.toFixed(2)) + '%');
+    insertCell(bodyrow2, String(p2MedianWounds));
+    insertCell(bodyrow2, String(p2AverageWounds.toFixed(2)));
+    const p1v = result.player1.values;
+    let text1 = 'Att. Pool ' + p1v.attPool
+        + ' | Def. Pool ' + p1v.defPool
+        + ' | Damage mod. ' + p1v.dmgModifier;
+    if (p1v.kata) {
+        text1 += ' | Kata';
     }
-    if (result.values.attProwess) {
-        text += ' | Prowess [Attack] (' + result.values.attProwess + ')';
+    if (p1v.combo) {
+        text1 += ' | Combo Attack';
     }
-    if (result.values.defProwess) {
-        text += ' | Prowess [Defence] (' + result.values.defProwess + ')';
+    if (p1v.attProwess) {
+        text1 += ' | Prowess [Attack] (' + p1v.attProwess + ')';
     }
-    if (result.values.feint) {
-        text += ' | Feint (' + result.values.feint + ')';
+    if (p1v.brutal) {
+        text1 += ' | Brutal (' + p1v.brutal + ')';
     }
-    if (result.values.strong) {
-        text += ' | Strong';
+    if (p1v.feint) {
+        text1 += ' | Feint (' + p1v.feint + ')';
     }
-    if (result.values.weak) {
-        text += ' | Weak';
+    if (p1v.strong) {
+        text1 += ' | Strong';
     }
-    if (result.values.attKata) {
-        text += ' | Kata (Attacker)';
+    if (p1v.weak) {
+        text1 += ' | Weak';
     }
-    if (result.values.combo) {
-        text += ' | Combo Attack';
+    if (p1v.unblockable) {
+        text1 += ' | Unblockable (' + p1v.unblockable + ')';
     }
-    if (result.values.tough) {
-        text += ' | Tough (' + result.values.tough + ')';
+    if (p1v.defProwess) {
+        text1 += ' | Prowess [Defence] (' + p1v.defProwess + ')';
     }
-    if (result.values.parry) {
-        text += ' | Parry (' + result.values.parry + ')';
+    if (p1v.parry) {
+        text1 += ' | Parry (' + p1v.parry + ')';
     }
-    if (result.values.dodge) {
-        text += ' | Dodge (' + result.values.dodge + ')';
+    if (p1v.dodge) {
+        text1 += ' | Dodge (' + p1v.dodge + ')';
     }
-    if (result.values.defKata) {
-        text += ' | Kata (Defender)';
+    if (p1v.tough) {
+        text1 += ' | Tough (' + p1v.tough + ')';
+    }
+    if (p1v.impDefence) {
+        text1 += ' | Impenetrable Defence (' + p1v.impDefence + ')';
+    }
+    const p2v = result.player2.values;
+    let text2 = 'Att. Pool ' + p2v.attPool
+        + ' | Def. Pool ' + p2v.defPool
+        + ' | Damage mod. ' + p2v.dmgModifier;
+    if (p2v.kata) {
+        text2 += ' | Kata';
+    }
+    if (p2v.combo) {
+        text2 += ' | Combo Attack';
+    }
+    if (p2v.attProwess) {
+        text2 += ' | Prowess [Attack] (' + p2v.attProwess + ')';
+    }
+    if (p2v.brutal) {
+        text2 += ' | Brutal (' + p2v.brutal + ')';
+    }
+    if (p2v.feint) {
+        text2 += ' | Feint (' + p2v.feint + ')';
+    }
+    if (p2v.strong) {
+        text2 += ' | Strong';
+    }
+    if (p2v.weak) {
+        text2 += ' | Weak';
+    }
+    if (p2v.unblockable) {
+        text2 += ' | Unblockable (' + p2v.unblockable + ')';
+    }
+    if (p2v.defProwess) {
+        text2 += ' | Prowess [Defence] (' + p2v.defProwess + ')';
+    }
+    if (p2v.parry) {
+        text2 += ' | Parry (' + p2v.parry + ')';
+    }
+    if (p2v.dodge) {
+        text2 += ' | Dodge (' + p2v.dodge + ')';
+    }
+    if (p2v.tough) {
+        text2 += ' | Tough (' + p2v.tough + ')';
+    }
+    if (p2v.impDefence) {
+        text2 += ' | Impenetrable Defence (' + p2v.impDefence + ')';
     }
     const caption = table.createCaption();
-    caption.innerText = text;
+    caption.innerHTML = 'Active : ' + text1 + '<br>Non active : ' + text2;
     const container = document.getElementById('melee-result-container');
     while (container.firstChild) {
         container.firstChild.remove();
@@ -329,21 +384,37 @@ function renderMeleeTable(result) {
     container.appendChild(table);
 }
 function renderMeleeChart(chart, result) {
-    const wounds1 = result.wounds.reduce((p, c) => {
+    const wounds1 = result.player1.wounds.reduce((p, c) => {
+        const d = p[c] || 0;
+        p[c] = d + 1;
+        return p;
+    }, []);
+    const wounds2 = result.player2.wounds.reduce((p, c) => {
         const d = p[c] || 0;
         p[c] = d + 1;
         return p;
     }, []);
     const data1 = [];
+    const data2 = [];
     for (let i = 0; i < wounds1.length; i++) {
         const sum = wounds1.slice(i).reduce((p, c) => p + (c || 0), 0);
-        data1.push(sum * 100 / result.wounds.length);
+        data1.push(sum * 100 / result.player1.wounds.length);
+    }
+    for (let i = 0; i < wounds2.length; i++) {
+        const sum = wounds2.slice(i).reduce((p, c) => p + (c || 0), 0);
+        data2.push(sum * 100 / result.player2.wounds.length);
     }
     chart.data.datasets = [
         {
             type: 'line',
-            label: 'Attacker',
+            label: 'Active player',
             data: data1,
+            spanGaps: true,
+        },
+        {
+            type: 'line',
+            label: 'Non active player',
+            data: data2,
             spanGaps: true,
         }
     ];
@@ -472,120 +543,235 @@ function calcMelee() {
     const form = document.querySelector('#form-melee');
     const valid = form.reportValidity();
     if (valid) {
-        const inputAttPool = document.querySelector('#melee-att-pool');
-        const attPool = Number(inputAttPool.value);
-        const inputDodge = document.querySelector('#melee-dodge');
-        const dodge = Number(inputDodge.value);
-        const inputAttProwess = document.querySelector('#melee-att-prowess');
-        const attProwess = Number(inputAttProwess.value);
-        const selectAttKata = document.querySelector('#melee-att-kata');
-        const attKata = Boolean(Number(selectAttKata.value));
-        const inputDefProwess = document.querySelector('#melee-def-prowess');
-        const defProwess = Number(inputDefProwess.value);
-        const inputFeint = document.querySelector('#melee-feint');
-        const feint = Number(inputFeint.value);
-        const selectDefKata = document.querySelector('#melee-def-kata');
-        const defKata = Boolean(Number(selectDefKata.value));
-        const inputBrutal = document.querySelector('#melee-brutal');
-        const brutal = Number(inputBrutal.value);
-        const inputParry = document.querySelector('#melee-parry');
-        const parry = Number(inputParry.value);
-        const inputDefPool = document.querySelector('#melee-def-pool');
-        const defPool = Number(inputDefPool.value);
-        const selectCombo = document.querySelector('#melee-combo');
-        const combo = Boolean(Number(selectCombo.value));
-        const selectStrongWeak = document.querySelector('#melee-strong-weak');
-        const strong = Number(selectStrongWeak.value) === 1;
-        const weak = Number(selectStrongWeak.value) === 2;
-        const inputDmgModifier = document.querySelector('#melee-dmg-modifier');
-        const dmgModifier = Number(inputDmgModifier.value);
-        const inputTough = document.querySelector('#melee-tough');
-        const tough = Number(inputTough.value);
-        const attackerActive = true;
-        const hits = [];
-        const wounds = [];
+        const inputP1AttPool = document.querySelector('#melee-p1-att-pool');
+        const p1AttPool = Number(inputP1AttPool.value);
+        const inputP2AttPool = document.querySelector('#melee-p2-att-pool');
+        const p2AttPool = Number(inputP2AttPool.value);
+        const inputP1Dodge = document.querySelector('#melee-p1-dodge');
+        const p1Dodge = Number(inputP1Dodge.value);
+        const inputP2Dodge = document.querySelector('#melee-p2-dodge');
+        const p2Dodge = Number(inputP2Dodge.value);
+        const inputP1AttProwess = document.querySelector('#melee-p1-att-prowess');
+        const p1AttProwess = Number(inputP1AttProwess.value);
+        const inputP2AttProwess = document.querySelector('#melee-p2-att-prowess');
+        const p2AttProwess = Number(inputP2AttProwess.value);
+        const selectP1Kata = document.querySelector('#melee-p1-kata');
+        const p1Kata = Boolean(Number(selectP1Kata.value));
+        const selectP2Kata = document.querySelector('#melee-p2-kata');
+        const p2Kata = Boolean(Number(selectP2Kata.value));
+        const inputP1DefProwess = document.querySelector('#melee-p1-def-prowess');
+        const p1DefProwess = Number(inputP1DefProwess.value);
+        const inputP2DefProwess = document.querySelector('#melee-p2-def-prowess');
+        const p2DefProwess = Number(inputP2DefProwess.value);
+        const inputP1Feint = document.querySelector('#melee-p1-feint');
+        const p1Feint = Number(inputP1Feint.value);
+        const inputP2Feint = document.querySelector('#melee-p2-feint');
+        const p2Feint = Number(inputP2Feint.value);
+        const inputP1Brutal = document.querySelector('#melee-p1-brutal');
+        const p1Brutal = Number(inputP1Brutal.value);
+        const inputP2Brutal = document.querySelector('#melee-p2-brutal');
+        const p2Brutal = Number(inputP2Brutal.value);
+        const inputP1Parry = document.querySelector('#melee-p1-parry');
+        const p1Parry = Number(inputP1Parry.value);
+        const inputP2Parry = document.querySelector('#melee-p2-parry');
+        const p2Parry = Number(inputP2Parry.value);
+        const inputP1DefPool = document.querySelector('#melee-p1-def-pool');
+        const p1DefPool = Number(inputP1DefPool.value);
+        const inputP2DefPool = document.querySelector('#melee-p2-def-pool');
+        const p2DefPool = Number(inputP2DefPool.value);
+        const selectP1Combo = document.querySelector('#melee-p1-combo');
+        const p1Combo = Boolean(Number(selectP1Combo.value));
+        const selectP2Combo = document.querySelector('#melee-p2-combo');
+        const p2Combo = Boolean(Number(selectP2Combo.value));
+        const selectP1StrongWeak = document.querySelector('#melee-p1-strong-weak');
+        const p1Strong = Number(selectP1StrongWeak.value) === 1;
+        const p1Weak = Number(selectP1StrongWeak.value) === 2;
+        const selectP2StrongWeak = document.querySelector('#melee-p2-strong-weak');
+        const p2Strong = Number(selectP2StrongWeak.value) === 1;
+        const p2Weak = Number(selectP2StrongWeak.value) === 2;
+        const inputP1DmgModifier = document.querySelector('#melee-p1-dmg-modifier');
+        const p1DmgModifier = Number(inputP1DmgModifier.value);
+        const inputP2DmgModifier = document.querySelector('#melee-p2-dmg-modifier');
+        const p2DmgModifier = Number(inputP2DmgModifier.value);
+        const inputP1Tough = document.querySelector('#melee-p1-tough');
+        const p1Tough = Number(inputP1Tough.value);
+        const inputP2Tough = document.querySelector('#melee-p2-tough');
+        const p2Tough = Number(inputP2Tough.value);
+        const inputP1Unblock = document.querySelector('#melee-p1-unblock');
+        const p1Unblock = Number(inputP1Unblock.value);
+        const inputP2Unblock = document.querySelector('#melee-p2-unblock');
+        const p2Unblock = Number(inputP2Unblock.value);
+        const inputP1ImpDef = document.querySelector('#melee-p1-impdef');
+        const p1ImpDef = Number(inputP1ImpDef.value);
+        const inputP2ImpDef = document.querySelector('#melee-p2-impdef');
+        const p2ImpDef = Number(inputP2ImpDef.value);
+        const p1Hits = [];
+        const p1Wounds = [];
+        const p2Hits = [];
+        const p2Wounds = [];
         for (let x = 0; x < SIM_COUNT; x++) {
-            const attDices = [];
-            for (let i = 0; i < attPool; i++) {
+            const p1AttDices = [];
+            for (let i = 0; i < p1AttPool; i++) {
                 const dice = d6();
-                attDices.push(dice);
+                p1AttDices.push(dice);
             }
-            if (dodge) {
-                rerollDodgeFeint(attDices, dodge);
+            const p2AttDices = [];
+            for (let i = 0; i < p2AttPool; i++) {
+                const dice = d6();
+                p2AttDices.push(dice);
             }
-            if (attProwess) {
-                rerollProwess(attDices, attProwess);
+            if (p2Dodge) {
+                rerollDodgeFeint(p1AttDices, p2Dodge);
             }
-            const attResult = getTestResult(attDices, attKata);
-            let hit = false;
-            let wound = 0;
-            if (attResult !== -1) {
-                const defDices = [];
-                for (let i = 0; i < defPool; i++) {
+            if (p1AttProwess) {
+                rerollProwess(p1AttDices, p1AttProwess);
+            }
+            if (p2AttProwess) {
+                rerollProwess(p2AttDices, p2AttProwess);
+            }
+            if (p1Dodge) {
+                rerollDodgeFeint(p2AttDices, p1Dodge);
+            }
+            const p1AttResult = getTestResult(p1AttDices, p1Kata);
+            const p2AttResult = getTestResult(p2AttDices, p2Kata);
+            let p1Hit = false;
+            let p1Wound = 0;
+            let p2Hit = false;
+            let p2Wound = 0;
+            if (p1AttResult !== -1) {
+                const p2DefDices = [];
+                for (let i = 0; i < p2DefPool; i++) {
                     const dice = d6();
-                    defDices.push(dice);
+                    p2DefDices.push(dice);
                 }
-                if (defProwess) {
-                    rerollProwess(defDices, defProwess);
+                if (p2DefProwess) {
+                    rerollProwess(p2DefDices, p2DefProwess);
                 }
-                if (feint) {
-                    rerollDodgeFeint(defDices, feint);
+                if (p1Feint) {
+                    rerollDodgeFeint(p2DefDices, p1Feint);
                 }
-                const defResult = getTestResult(defDices, defKata);
-                let sl = (defResult === -1) ? attResult + brutal : attResult + brutal - (defResult + parry);
-                if (sl === 0) {
-                    if (attDices.length < defDices.length) {
-                        sl = -1;
-                    }
-                    else if (attDices.length === defDices.length && !attackerActive) {
-                        sl = -1;
+                const p2DefResult = getTestResult(p2DefDices, p2Kata);
+                const res1 = p1AttResult + p1Brutal;
+                let sl1 = p2DefResult === -1 ? res1 : res1 - (p2DefResult + p2Parry);
+                if (sl1 === 0) {
+                    if (p1AttDices.length < p2DefDices.length) {
+                        sl1 = -1;
                     }
                 }
-                const sucessLevels = getSucessLevels(sl, combo);
-                hit = sucessLevels.length ? true : false;
-                for (let i = 0; i < sucessLevels.length; i++) {
+                const p1SLs = getSucessLevels(sl1, p1Combo);
+                p1Hit = p1SLs.length ? true : false;
+                for (let i = 0; i < p1SLs.length; i++) {
                     const dice1 = d6();
                     const dice2 = d6();
                     const dmgDices = [dice1, dice2];
-                    if (strong) {
+                    if (p1Strong) {
                         const dice3 = d6();
                         dmgDices.push(dice3);
                         dmgDices.sort((a, b) => b - a);
                     }
-                    else if (weak) {
+                    else if (p1Weak) {
                         const dice3 = d6();
                         dmgDices.push(dice3);
                         dmgDices.sort((a, b) => a - b);
                     }
                     const dmgRoll = dmgDices.slice(0, 2).reduce((a, b) => a + b);
-                    const dmgRollMod = dmgRoll + dmgModifier;
-                    const sl = sucessLevels[i];
-                    wound += getWounds(dmgRollMod, sl, tough);
+                    const dmgRollMod = dmgRoll + p1DmgModifier;
+                    const sl = p1SLs[i];
+                    p1Wound += getWounds(dmgRollMod, sl, p2Tough);
                 }
             }
-            hits.push(hit);
-            wounds.push(wound);
+            if (p2AttResult !== -1) {
+                const p1DefDices = [];
+                for (let i = 0; i < p1DefPool; i++) {
+                    const dice = d6();
+                    p1DefDices.push(dice);
+                }
+                if (p2Feint) {
+                    rerollDodgeFeint(p1DefDices, p2Feint);
+                }
+                if (p1DefProwess) {
+                    rerollProwess(p1DefDices, p1DefProwess);
+                }
+                const p1DefResult = getTestResult(p1DefDices, p1Kata);
+                const res2 = p2AttResult + p2Brutal;
+                let sl2 = p1DefResult === -1 ? res2 : res2 - (p1DefResult + p1Parry);
+                if (sl2 === 0) {
+                    if (p2AttDices.length < p1DefDices.length) {
+                        sl2 = -1;
+                    }
+                }
+                const p2SLs = getSucessLevels(sl2, p2Combo);
+                p2Hit = p2SLs.length ? true : false;
+                for (let i = 0; i < p2SLs.length; i++) {
+                    const dice1 = d6();
+                    const dice2 = d6();
+                    const dmgDices = [dice1, dice2];
+                    if (p2Strong) {
+                        const dice3 = d6();
+                        dmgDices.push(dice3);
+                        dmgDices.sort((a, b) => b - a);
+                    }
+                    else if (p2Weak) {
+                        const dice3 = d6();
+                        dmgDices.push(dice3);
+                        dmgDices.sort((a, b) => a - b);
+                    }
+                    const dmgRoll = dmgDices.slice(0, 2).reduce((a, b) => a + b);
+                    const dmgRollMod = dmgRoll + p2DmgModifier;
+                    const sl = p2SLs[i];
+                    p2Wound += getWounds(dmgRollMod, sl, p1Tough);
+                }
+            }
+            p1Hits.push(p1Hit);
+            p1Wounds.push(p1Wound);
+            p2Hits.push(p2Hit);
+            p2Wounds.push(p2Wound);
         }
         return {
-            values: {
-                attPool,
-                defPool,
-                dmgModifier,
-                brutal,
-                attProwess,
-                defProwess,
-                feint,
-                strong,
-                weak,
-                attKata,
-                combo,
-                tough,
-                parry,
-                dodge,
-                defKata,
+            player1: {
+                values: {
+                    attPool: p1AttPool,
+                    defPool: p1DefPool,
+                    dmgModifier: p1DmgModifier,
+                    brutal: p1Brutal,
+                    attProwess: p1AttProwess,
+                    defProwess: p1DefPool,
+                    feint: p1Feint,
+                    strong: p1Strong,
+                    weak: p1Weak,
+                    combo: p1Combo,
+                    tough: p1Tough,
+                    parry: p1Parry,
+                    dodge: p1Dodge,
+                    kata: p1Kata,
+                    unblockable: p1Unblock,
+                    impDefence: p1ImpDef,
+                },
+                hits: p1Hits,
+                wounds: p1Wounds
             },
-            hits,
-            wounds
+            player2: {
+                values: {
+                    attPool: p2AttPool,
+                    defPool: p2DefPool,
+                    dmgModifier: p2DmgModifier,
+                    brutal: p2Brutal,
+                    attProwess: p2AttProwess,
+                    defProwess: p2DefPool,
+                    feint: p2Feint,
+                    strong: p2Strong,
+                    weak: p2Weak,
+                    combo: p2Combo,
+                    tough: p2Tough,
+                    parry: p2Parry,
+                    dodge: p2Dodge,
+                    kata: p2Kata,
+                    unblockable: p2Unblock,
+                    impDefence: p2ImpDef,
+                },
+                hits: p2Hits,
+                wounds: p2Wounds
+            }
         };
     }
 }
@@ -633,14 +819,18 @@ const chartMelee = new Chart(ctx2, chartConfig);
 const btnCalcRanged = document.getElementById('btn-ranged-calc');
 btnCalcRanged.addEventListener('click', () => {
     const result = calcRanged();
-    renderRangedTable(result);
-    canvas1.classList.remove('d-none');
-    renderRangedChart(chartRanged, result);
+    if (result) {
+        renderRangedTable(result);
+        canvas1.classList.remove('d-none');
+        renderRangedChart(chartRanged, result);
+    }
 });
 const btnCalcMelee = document.getElementById('btn-melee-calc');
 btnCalcMelee.addEventListener('click', () => {
     const result = calcMelee();
-    renderMeleeTable(result);
-    canvas2.classList.remove('d-none');
-    renderMeleeChart(chartMelee, result);
+    if (result) {
+        renderMeleeTable(result);
+        canvas2.classList.remove('d-none');
+        renderMeleeChart(chartMelee, result);
+    }
 });
