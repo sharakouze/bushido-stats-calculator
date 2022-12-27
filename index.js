@@ -53,7 +53,7 @@ function rerollDodgeFeint(dices, count) {
         dices[index] = dice;
     }
 }
-function getTestResult(dices, kata) {
+function getTestResult(dices, kata, removeHighest) {
     if (!kata) {
         let i = 0;
         while (i < dices.length) {
@@ -64,6 +64,14 @@ function getTestResult(dices, kata) {
                 ++i;
             }
         }
+    }
+    while (removeHighest > 0) {
+        const max = Math.max(...dices);
+        const index = dices.indexOf(max);
+        if (index !== -1) {
+            dices.splice(index, 1);
+        }
+        removeHighest--;
     }
     if (dices.length === 0) {
         return -1;
@@ -77,7 +85,7 @@ function getTestResult(dices, kata) {
     }
     return max + dices.length - 1;
 }
-function getSucessLevels(sl, combo) {
+function getSuccessLevels(sl, combo) {
     const levels = [];
     if (combo) {
         if (sl === 0 || sl === 1) {
@@ -122,14 +130,6 @@ function getAverage(arr) {
         return NaN;
     }
     return arr.reduce((a, b) => a + b) / arr.length;
-}
-function getStandardDeviation(arr) {
-    if (arr.length == 0) {
-        return NaN;
-    }
-    const n = arr.length;
-    const mean = arr.reduce((a, b) => a + b) / n;
-    return Math.sqrt(arr.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
 }
 function insertThCell(tr, text) {
     const th = document.createElement('th');
@@ -460,7 +460,7 @@ function calcRanged() {
             if (prowess) {
                 rerollProwess(attDices, prowess);
             }
-            const result = getTestResult(attDices, false);
+            const result = getTestResult(attDices, false, 0);
             let shortRangeHit = false;
             let mediumRangeHit = false;
             let longRangeHit = false;
@@ -469,11 +469,11 @@ function calcRanged() {
             let longRangeWound = 0;
             if (result !== -1) {
                 const sl1 = result + brutal - (4 + attModifier);
-                const shortRangeSLs = getSucessLevels(sl1, combo);
+                const shortRangeSLs = getSuccessLevels(sl1, combo);
                 const sl2 = result + brutal - (5 + attModifier);
-                const mediumRangeSLs = getSucessLevels(sl2, combo);
+                const mediumRangeSLs = getSuccessLevels(sl2, combo);
                 const sl3 = result + brutal - (6 + attModifier);
-                const longRangeSLs = getSucessLevels(sl3, combo);
+                const longRangeSLs = getSuccessLevels(sl3, combo);
                 shortRangeHit = shortRangeSLs.length ? true : false;
                 mediumRangeHit = mediumRangeSLs.length ? true : false;
                 longRangeHit = longRangeSLs.length ? true : false;
@@ -632,8 +632,8 @@ function calcMelee() {
             if (p1Dodge) {
                 rerollDodgeFeint(p2AttDices, p1Dodge);
             }
-            const p1AttResult = getTestResult(p1AttDices, p1Kata);
-            const p2AttResult = getTestResult(p2AttDices, p2Kata);
+            const p1AttResult = getTestResult(p1AttDices, p1Kata, p2ImpDef);
+            const p2AttResult = getTestResult(p2AttDices, p2Kata, p1ImpDef);
             let p1Hit = false;
             let p1Wound = 0;
             let p2Hit = false;
@@ -650,7 +650,7 @@ function calcMelee() {
                 if (p1Feint) {
                     rerollDodgeFeint(p2DefDices, p1Feint);
                 }
-                const p2DefResult = getTestResult(p2DefDices, p2Kata);
+                const p2DefResult = getTestResult(p2DefDices, p2Kata, p1Unblock);
                 const res1 = p1AttResult + p1Brutal;
                 let sl1 = p2DefResult === -1 ? res1 : res1 - (p2DefResult + p2Parry);
                 if (sl1 === 0) {
@@ -658,7 +658,7 @@ function calcMelee() {
                         sl1 = -1;
                     }
                 }
-                const p1SLs = getSucessLevels(sl1, p1Combo);
+                const p1SLs = getSuccessLevels(sl1, p1Combo);
                 p1Hit = p1SLs.length ? true : false;
                 for (let i = 0; i < p1SLs.length; i++) {
                     const dice1 = d6();
@@ -692,15 +692,15 @@ function calcMelee() {
                 if (p1DefProwess) {
                     rerollProwess(p1DefDices, p1DefProwess);
                 }
-                const p1DefResult = getTestResult(p1DefDices, p1Kata);
+                const p1DefResult = getTestResult(p1DefDices, p1Kata, p2Unblock);
                 const res2 = p2AttResult + p2Brutal;
                 let sl2 = p1DefResult === -1 ? res2 : res2 - (p1DefResult + p1Parry);
                 if (sl2 === 0) {
-                    if (p2AttDices.length < p1DefDices.length) {
+                    if (p2AttDices.length <= p1DefDices.length) {
                         sl2 = -1;
                     }
                 }
-                const p2SLs = getSucessLevels(sl2, p2Combo);
+                const p2SLs = getSuccessLevels(sl2, p2Combo);
                 p2Hit = p2SLs.length ? true : false;
                 for (let i = 0; i < p2SLs.length; i++) {
                     const dice1 = d6();
@@ -781,7 +781,7 @@ const chartConfig = {
             x: {
                 title: {
                     display: true,
-                    text: 'Minimum wounds probability'
+                    text: 'Minimum wounds'
                 }
             },
             y: {

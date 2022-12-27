@@ -105,7 +105,7 @@ function getTestResult(dices: number[], kata: boolean, removeHighest: number): n
     return max + dices.length - 1;
 }
 
-function getSucessLevels(sl: number, combo: boolean): number[] {
+function getSuccessLevels(sl: number, combo: boolean): number[] {
     const levels: number[] = [];
     if (combo) {
         if (sl === 0 || sl === 1) {
@@ -632,13 +632,13 @@ function calcRanged(): IRangedResult | undefined {
 
             if (result !== -1) {
                 const sl1 = result + brutal - (4 + attModifier);
-                const shortRangeSLs = getSucessLevels(sl1, combo);
+                const shortRangeSLs = getSuccessLevels(sl1, combo);
 
                 const sl2 = result + brutal - (5 + attModifier);
-                const mediumRangeSLs = getSucessLevels(sl2, combo);
+                const mediumRangeSLs = getSuccessLevels(sl2, combo);
 
                 const sl3 = result + brutal - (6 + attModifier);
-                const longRangeSLs = getSucessLevels(sl3, combo);
+                const longRangeSLs = getSuccessLevels(sl3, combo);
 
                 shortRangeHit = shortRangeSLs.length ? true : false;
                 mediumRangeHit = mediumRangeSLs.length ? true : false;
@@ -859,7 +859,7 @@ function calcMelee(): IMeleeResult | undefined {
                     }
                 }
 
-                const p1SLs = getSucessLevels(sl1, p1Combo);
+                const p1SLs = getSuccessLevels(sl1, p1Combo);
 
                 p1Hit = p1SLs.length ? true : false;
 
@@ -905,12 +905,12 @@ function calcMelee(): IMeleeResult | undefined {
                 const res2 = p2AttResult + p2Brutal;
                 let sl2 = p1DefResult === -1 ? res2 : res2 - (p1DefResult + p1Parry);
                 if (sl2 === 0) {
-                    if (p2AttDices.length < p1DefDices.length) {
+                    if (p2AttDices.length <= p1DefDices.length) {
                         sl2 = -1;
                     }
                 }
 
-                const p2SLs = getSucessLevels(sl2, p2Combo);
+                const p2SLs = getSuccessLevels(sl2, p2Combo);
 
                 p2Hit = p2SLs.length ? true : false;
 
