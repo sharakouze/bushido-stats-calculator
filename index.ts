@@ -67,7 +67,7 @@ function rerollDodgeFeint(dices: number[], count: number): void {
     }
 }
 
-function getTestResult(dices: number[], kata: boolean): number {
+function getTestResult(dices: number[], kata: boolean, removeHighest: number): number {
     if (!kata) {
         // remove 1's from the pool
         let i = 0;
@@ -79,6 +79,16 @@ function getTestResult(dices: number[], kata: boolean): number {
                 ++i;
             }
         }
+    }
+
+    // remove x highest dices
+    while (removeHighest > 0) {
+        const max = Math.max(...dices);
+        const index = dices.indexOf(max);
+        if (index !== -1) {
+            dices.splice(index, 1);
+        }
+        removeHighest--;
     }
 
     if (dices.length === 0) {
@@ -140,21 +150,11 @@ function getMedian(arr: number[]): number {
     const midpoint = Math.floor(arr.length / 2);
     return arr.length % 2 === 1 ? arr[midpoint] : (arr[midpoint - 1] + arr[midpoint]) / 2;
 }
-
 function getAverage(arr: number[]): number {
     if (arr.length == 0) {
         return NaN;
     }
     return arr.reduce((a, b) => a + b) / arr.length;
-}
-
-function getStandardDeviation(arr: number[]): number {
-    if (arr.length == 0) {
-        return NaN;
-    }
-    const n = arr.length
-    const mean = arr.reduce((a, b) => a + b) / n
-    return Math.sqrt(arr.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
 }
 
 function insertThCell(tr: HTMLTableRowElement, text?: string): void {
@@ -620,7 +620,7 @@ function calcRanged(): IRangedResult | undefined {
                 rerollProwess(attDices, prowess);
             }
 
-            const result = getTestResult(attDices, false);
+            const result = getTestResult(attDices, false, 0);
 
             let shortRangeHit = false;
             let mediumRangeHit = false;
@@ -798,7 +798,6 @@ function calcMelee(): IMeleeResult | undefined {
 
         const p1Hits: boolean[] = [];
         const p1Wounds: number[] = [];
-
         const p2Hits: boolean[] = [];
         const p2Wounds: number[] = [];
 
@@ -828,8 +827,8 @@ function calcMelee(): IMeleeResult | undefined {
                 rerollDodgeFeint(p2AttDices, p1Dodge);
             }
 
-            const p1AttResult = getTestResult(p1AttDices, p1Kata);
-            const p2AttResult = getTestResult(p2AttDices, p2Kata);
+            const p1AttResult = getTestResult(p1AttDices, p1Kata, p2ImpDef);
+            const p2AttResult = getTestResult(p2AttDices, p2Kata, p1ImpDef);
 
             let p1Hit = false;
             let p1Wound = 0;
@@ -850,7 +849,7 @@ function calcMelee(): IMeleeResult | undefined {
                     rerollDodgeFeint(p2DefDices, p1Feint);
                 }
 
-                const p2DefResult = getTestResult(p2DefDices, p2Kata);
+                const p2DefResult = getTestResult(p2DefDices, p2Kata, p1Unblock);
 
                 const res1 = p1AttResult + p1Brutal;
                 let sl1 = p2DefResult === -1 ? res1 : res1 - (p2DefResult + p2Parry);
@@ -901,7 +900,7 @@ function calcMelee(): IMeleeResult | undefined {
                     rerollProwess(p1DefDices, p1DefProwess);
                 }
 
-                const p1DefResult = getTestResult(p1DefDices, p1Kata);
+                const p1DefResult = getTestResult(p1DefDices, p1Kata, p2Unblock);
 
                 const res2 = p2AttResult + p2Brutal;
                 let sl2 = p1DefResult === -1 ? res2 : res2 - (p1DefResult + p1Parry);
@@ -953,7 +952,7 @@ function calcMelee(): IMeleeResult | undefined {
                     dmgModifier: p1DmgModifier,
                     brutal: p1Brutal,
                     attProwess: p1AttProwess,
-                    defProwess: p1DefPool,
+                    defProwess: p1DefProwess,
                     feint: p1Feint,
                     strong: p1Strong,
                     weak: p1Weak,
@@ -975,7 +974,7 @@ function calcMelee(): IMeleeResult | undefined {
                     dmgModifier: p2DmgModifier,
                     brutal: p2Brutal,
                     attProwess: p2AttProwess,
-                    defProwess: p2DefPool,
+                    defProwess: p2DefProwess,
                     feint: p2Feint,
                     strong: p2Strong,
                     weak: p2Weak,
@@ -990,7 +989,7 @@ function calcMelee(): IMeleeResult | undefined {
                 hits: p2Hits,
                 wounds: p2Wounds
             }
-        }
+        };
     }
 }
 
@@ -1000,7 +999,7 @@ const chartConfig = {
             x: {
                 title: {
                     display: true,
-                    text: 'Minimum wounds probability'
+                    text: 'Minimum wounds'
                 }
             },
             y: {
